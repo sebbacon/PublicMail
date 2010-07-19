@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+{% if user.is_anonymous %}
+<div class="span-1">
+ <div class="panel">
+  <h2>Sign up to enter</h2>
+ </div>
+</div>
+
+<div class="span-1">
+ <div class="panel">
+ {% if form %}
+  <form action="" method="post" id="signup">
+  <table id="join-form">
+  {{ form.as_table }}
+  <tr>
+   <td></td>
+   <td><input type="submit" value="sign up" /></td>
+  </tr>
+  </table>
+  </form>
+ {% endif %}
+ </div>
+</div>
+
+<div class="span-1 last">
+ <div class="panel">
+  <p>If you get it right you win £1million</p>
+  <p>100% free to play</p>
+ </div>
+</div>
+
+<div id="login">
+ <h2>Sign in</h2>
+ <p>Already a member? Sign in now</p>
+ <form method="post">
+  <table>
+   <tr>
+    <th><label for="email">Email</label></th>
+    <td><input type="text" name="email" /></td>
+   </tr>
+   <tr>
+    <th><label for="password">Password</label></th>
+    <td><input type="text" name="password" /></td>
+   </tr>
+   <tr>
+    <td></td>
+    <td><input type="submit" name="login" value="login" /></td>
+   </tr>
+  </table>
+ </form>
+</div>
+
+{% else %}
+<div class="span-1">
+ <h2>Welcome, {{user.display_name}}</h2>
+ <p>Currently, you have a score of {{ prediction.score }}{% if prediction.current_position %} which places you at position {{ prediction.current_position }}{% endif %}.
+
+ <h3>Your league history</h3>
+ <div id="sparkline">Chart goes here</div>
+
+ {% if user.is_active %}{% if prediction.current_position %}<a href="{% url table %}">See where you are in the league table</a>{% else %}<a href="{% url table %}">Visit the league table</a>{% endif %}{% endif %}
+</p>
+</div>
+<div class="span-1">
+<h3>You predicted:</h3>
+ <ol>
+ {% for p in prediction.ordered_teams.all %}
+  <li>{{ p.name }}</li>
+ {% endfor %}
+ </ol>
+</div>
+<div class="span-1 last">
+<h3>The Premiership looks like:</h3>
+ <ol>
+ {% for p in current.ordered_teams.all %}
+  <li>{{ p.name }}</li>
+ {% endfor %}
+ </ol>
+</div>
+{% endif %}
+
+
+{% endblock %}
+

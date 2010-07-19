@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<div class="span-1">
+ <div class="panel">
+ <h2>Welcome, {{user.display_name|slice:":6"}}</h2>
+ <p>Currently, you have a score of {{ prediction.score }}{% if prediction.current_position %} which places you at position {{ prediction.current_position }}{% endif %}.
+ </div>
+</div>
+
+<div class="span-1">
+ <div class="panel">
+ <h3>Your league history</h3>
+ <div id="sparkline">Chart goes here</div>
+<p>
+ {% if user.is_active %}{% if prediction.current_position %}<a href="{% url table %}">See where you are in the league table</a>{% else %}<a href="{% url table %}">Visit the league table</a>{% endif %}{% endif %}
+</p>
+ </div>
+</div>
+
+<div class="span-1 last">
+ <div class="panel">
+ <h3>Your leagues</h3>
+ <p>You're in three leagues and this is where we'll tell you about them.</p>
+ </div>
+</div>
+
+<div class="span-1 border-top">
+ <div class="panel">
+ <h3>Your selection</h3>
+ <p>
+  <ol>
+  {% for p in prediction.ordered_teams.all %}
+   <li>{{ p.name }}</li>
+  {% endfor %}
+  </ol>
+  </p>
+ </div>
+</div>
+
+<div class="span-1  border-top">
+ <div class="panel">
+ <h3>Current league table</h3>
+ <p>
+  <ol>
+  {% for p in current.ordered_teams.all %}
+   <li>{{ p.name }}</li>
+  {% endfor %}
+  </ol>
+  </p>
+ </div>
+</div>
+
+<div class="span-1 border-top last">
+ <div class="panel">
+ <h3>Stuff</h3>
+ <p>
+   Stuff.
+  </p>
+ </div>
+</div>
+
+{% endblock %}
+
+{% block extra-head %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("visualization", "1", {packages:["imagesparkline"]});
+google.setOnLoadCallback(drawChart);
+
+function drawChart() {
+  var gdata = new google.visualization.DataTable();
+  $.getJSON('/json_get_history/',
+	    function(data) {
+		gdata.addColumn("number", "Position");
+		gdata.addRows(data.count);
+		$.each(data.positions, function(i, position) {
+			gdata.setValue(i, 0, 324-position);
+		    });
+		var chart = new google.visualization.ImageSparkLine(document.getElementById('sparkline'));
+		chart.draw(gdata, {width: 270, height:80, showValueLabels: false});
+	    });
+}
+
+
+</script>
+{% endblock %}
+
+

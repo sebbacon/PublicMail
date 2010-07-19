@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Preview your message{% endblock %}
+
+{% block content %}
+
+To: {{ message.mto.email }}<br />
+From: {{ message.mfrom.email }}<br />
+Subject: {{ message.subject }}<br />
+Message:
+<p>{{ message.message }}</p>
+
+
+<form method="post">
+
+<input type="submit" name="send email" />
+
+</form>
+
+
+{% endblock %}
+

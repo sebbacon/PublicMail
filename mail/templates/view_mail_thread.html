@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Preview your message{% endblock %}
+
+{% block content %}
+
+To: {{ message.mto.email }}<br />
+From: {{ message.mfrom.email }}<br />
+Subject: {{ message.subject }}<br />
+Message:
+<p>{{ message.message }}</p>
+<hr />
+
+{% for submessage in message.next_in_thread %}
+To: {{ message.mto.email }}<br />
+From: {{ message.mfrom.email }}<br />
+Subject: {{ message.subject }}<br />
+Message:
+<p>{{ message.message }}</p>
+<hr />
+{% empty %}
+There's been no response to this email yet.
+
+{% endfor %}
+
+
+
+{% endblock %}
+

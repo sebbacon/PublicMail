@@ -1,0 +1,12 @@
+<tr class="field_{{ field.name }}{% if field.errors %} errors{% endif %}">
+  <th>
+    <label for="id_{{ field.name }}">{{ field.label }}</label>
+  </th>
+  <td>
+    {{ field }}
+    {% if field.errors %}{{ field.errors }}{% endif %}
+    {% if field.help_text %}
+    <p class="helptext">{{ field.help_text }}</p>
+    {% endif %}
+  </td>
+</tr>

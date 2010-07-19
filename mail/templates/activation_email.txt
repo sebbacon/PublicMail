@@ -1,0 +1,15 @@
+Hi {{ user.display_name }},
+
+Thanks for your entry to Whatever Trevor.
+
+You won't be able to log in again (or qualify for the prize) until you confirm your email address by logging in here:
+
+http://{{ site }}{% url activate key=activation_key %}
+
+In future, you can always access your account at this address:
+
+http://{{ site }}{% url login key=activation_key %}
+
+Thanks,
+
+Whatever Trevor

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Join more constituencies{% endblock %}
+
+{% block content %}
+
+<div class="span-4">
+<h2>Your constituencies</h2>
+<p>You are currently signed up as a volunteer in:</p>
+
+  <ul id="my-constituency-list">
+   {% for c in my_constituencies %}
+   <li>
+    <a href="{% url constituency slug=c.slug %}">{{ c.name }}</a>
+    <a href="{% url delete_constituency slug=c.slug %}">(leave)</a>
+   </li>
+   {% endfor %}
+  </ul>
+
+</div>
+<div class="span-4 last">
+<form method="post" action="">
+  <div id="search-constituency">
+    <h2>Help in another constituency</h2>
+    <ul id="constituency-list">
+    {% for c in constituencies %}
+       <li> <input name="add_c" type="checkbox" value="{{ c.slug }}" /> {{ c.name }}</li>
+    {% endfor %}
+    </ul>
+  </div> 
+  <input type="submit" name="add" value="add ticked constituencies" />
+  <div>
+    <input type="text" value="{{q}}" name="q" id="q" size="15" />
+    <input type="submit" name="search" value="search for a constituency" />
+  </div>
+</form>
+</div>
+
+{% endblock %}

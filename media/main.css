@@ -1,0 +1,79 @@
+html {font-size:100.01%;}
+
+body { 
+  font-size:85%;
+  font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+  background-color: lightgray;
+  color: #333;
+}
+
+
+
+h1, h2, h3, h4, h5, h5 {
+ color: white;
+ font-weight: normal;
+ margin: 0;
+ padding: 0;
+ border: 0;
+}
+
+#main {
+ border: solid #1e2038 5px;
+ background: white;
+ color: darkblue;
+}
+
+#header {
+ vertical-align: bottom;
+}
+
+#header #pages {
+ text-align: left;
+}
+#header #actions {
+ text-align: right;
+}
+#header ul, #footer ul {
+ margin: 0;
+ padding: 0;
+}
+
+
+#header div ul {
+ padding: 0;
+}
+
+#header div ul li, #footer div ul li {
+ list-style: none;
+ display: inline;
+ padding: 0;
+ padding-right: 2em;
+}
+
+
+.errorlist {
+ margin: 0;
+ color: red;
+ list-style: none;
+ font-size: 80%;
+ font-style: italic;
+}
+
+tr.errors td input {
+ border: solid red 2px;
+}
+
+span.required {
+ color: red;
+ float: right;
+}
+
+input {
+ font-size: 110%;
+}
+p.helptext {
+ font-size: 80%;
+ font-style: italic;
+ margin-top:3px;
+}
+

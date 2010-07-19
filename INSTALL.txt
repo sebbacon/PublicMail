@@ -1,0 +1,9 @@
+easy_install akismet
+
+create /etc/mailtrail-aliases:
+ /trail-.*/      "/var/www/mailtrail/process_mail.py"
+
+edit /etc/postfix/main.cf:
+ alias_maps = hash:/var/lib/mailman/data/aliases, hash:/etc/aliases, regexp:/etc/mailtrail-aliases
+
+

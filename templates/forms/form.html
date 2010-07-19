@@ -1,0 +1,13 @@
+{% if form.errors %}
+<div class="error">
+ <p>There was a problem:</p>
+ <ul>
+ {% for error in form.non_field_errors %}
+  <li>{{ error }}</li>
+ {% endfor %}
+ </ul>
+</div>
+{% endif %}
+{% for field in bound_fields %}
+{% include "forms/field.html" %}
+{% endfor %}

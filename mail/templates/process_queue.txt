@@ -1,0 +1,3 @@
+{% for msg in done %}
+ {{ msg }},
+{% endfor %}
