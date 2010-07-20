@@ -47,7 +47,8 @@ class TemplatedForm(forms.Form):
 def send_mail(message=None,
               subject=None,
               mfrom=None,
-              mto=None):
+              mto=None,
+              message_id=None):
     """Send an email with the standard unsubscribe footer
     """
     
@@ -60,7 +61,7 @@ def send_mail(message=None,
                          message,
                          mfrom,
                          [mto],
-                         headers={'Message-ID':'asdasd'})
+                         headers={'Message-ID':message_id})
     return email.send()
 
 class render:

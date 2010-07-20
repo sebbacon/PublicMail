@@ -5,7 +5,6 @@ from akismet import Akismet
 
 from models import CustomUser
 from models import Mail
-from models import Recipient
 from utils import TemplatedForm
 import settings
 
@@ -57,8 +56,12 @@ class MessageForm(TemplatedForm):
             user.set_unusable_password()
             user.save()
         # now create an email, and decide if it needs moderation
-        recipient, _ = Recipient.objects.get_or_create(
+        recipient, created = CustomUser.objects.get_or_create(
+            username=self.cleaned_data['mto'],
             email=self.cleaned_data['mto'])
+        if created:
+            recipient.set_unusable_password()
+            recipient.save()
         message = Mail.objects.create(
             subject=self.cleaned_data['subject'],
             mfrom=user,

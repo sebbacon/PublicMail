@@ -13,13 +13,6 @@ class Migration:
         ))
         db.send_create_signal('mail', ['ProxyEmail'])
         
-        # Adding model 'Recipient'
-        db.create_table('mail_recipient', (
-            ('email', orm['mail.Recipient:email']),
-            ('organisation', orm['mail.Recipient:organisation']),
-        ))
-        db.send_create_signal('mail', ['Recipient'])
-        
         # Adding model 'Organisation'
         db.create_table('mail_organisation', (
             ('id', orm['mail.Organisation:id']),
@@ -31,6 +24,7 @@ class Migration:
         db.create_table('mail_customuser', (
             ('user_ptr', orm['mail.CustomUser:user_ptr']),
             ('proxy_email', orm['mail.CustomUser:proxy_email']),
+            ('organisation', orm['mail.CustomUser:organisation']),
             ('needs_moderation', orm['mail.CustomUser:needs_moderation']),
         ))
         db.send_create_signal('mail', ['CustomUser'])
@@ -45,6 +39,9 @@ class Migration:
             ('in_reply_to', orm['mail.Mail:in_reply_to']),
             ('previewed', orm['mail.Mail:previewed']),
             ('approved', orm['mail.Mail:approved']),
+            ('created', orm['mail.Mail:created']),
+            ('sent', orm['mail.Mail:sent']),
+            ('message_id', orm['mail.Mail:message_id']),
         ))
         db.send_create_signal('mail', ['Mail'])
         
@@ -54,9 +51,6 @@ class Migration:
         
         # Deleting model 'ProxyEmail'
         db.delete_table('mail_proxyemail')
-        
-        # Deleting model 'Recipient'
-        db.delete_table('mail_recipient')
         
         # Deleting model 'Organisation'
         db.delete_table('mail_organisation')
@@ -106,17 +100,21 @@ class Migration:
         },
         'mail.customuser': {
             'needs_moderation': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'organisation': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.Organisation']", 'null': 'True', 'blank': 'True'}),
             'proxy_email': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.ProxyEmail']"}),
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'mail.mail': {
             'approved': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'in_reply_to': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.Mail']", 'null': 'True', 'blank': 'True'}),
+            'in_reply_to': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['mail.Mail']", 'unique': 'True', 'null': 'True', 'blank': 'True'}),
             'message': ('django.db.models.fields.TextField', [], {}),
-            'mfrom': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.CustomUser']"}),
-            'mto': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.Recipient']"}),
+            'message_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'mfrom': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mfrom'", 'to': "orm['mail.CustomUser']"}),
+            'mto': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mto'", 'to': "orm['mail.CustomUser']"}),
             'previewed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'sent': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '120'})
         },
         'mail.organisation': {
@@ -125,10 +123,6 @@ class Migration:
         },
         'mail.proxyemail': {
             'proxy_email': ('django.db.models.fields.CharField', [], {'max_length': '10', 'primary_key': 'True'})
-        },
-        'mail.recipient': {
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'primary_key': 'True'}),
-            'organisation': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.Organisation']", 'null': 'True', 'blank': 'True'})
         }
     }
     

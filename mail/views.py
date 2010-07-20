@@ -21,7 +21,7 @@ def write(request):
     if request.user.is_anonymous():
         messages = []
     else:
-        messages = request.user.mail_set.filter(in_reply_to=None)
+        messages = request.user.mfrom_set.filter(in_reply_to=None)
     if request.method == "POST":
         form = MessageForm(request, request.POST, request.FILES)
         if form.is_valid():
@@ -52,10 +52,11 @@ def process_queue(request):
             subject=message.subject,
             mfrom="%s%s" % (settings.MAIL_PREFIX,
                             message.mfrom.proxy_email.proxy_email),
-            mto=message.mto.email)
+            mto=message.mto.email,
+            message_id=message.message_id)
         message.sent = datetime.now()
         message.save()
-        done.append((message, output))
+        done.append((message.subject, output))
     return locals()
 
         

@@ -1,0 +1,38 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: seb.bacon@gmail.com
+Received: by 10.204.123.141 with SMTP id p13cs112692bkr;
+        Tue, 20 Jul 2010 05:41:04 -0700 (PDT)
+Return-Path: <kim.strudwick@googlemail.com>
+Received-SPF: pass (google.com: domain of kim.strudwick@googlemail.com designates 10.86.52.1 as permitted sender) client-ip=10.86.52.1;
+Authentication-Results: mr.google.com; spf=pass (google.com: domain of kim.strudwick@googlemail.com designates 10.86.52.1 as permitted sender) smtp.mail=kim.strudwick@googlemail.com; dkim=pass header.i=kim.strudwick@googlemail.com
+Received: from mr.google.com ([10.86.52.1])
+        by 10.86.52.1 with SMTP id z1mr3924023fgz.77.1279629664088 (num_hops = 1);
+        Tue, 20 Jul 2010 05:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=gamma;
+        h=domainkey-signature:mime-version:received:received:date:message-id
+         :subject:from:to:content-type;
+        bh=NcpdwZpFCvHeb4P1FvXt2DYItMnYl7KbYz6VzxVJOZc=;
+        b=Tio40QPGaHUdHKWCKKufmFBCcWjs0Am13ijYHe9z7uKyFZ31YNw7yXdQ9ZUAVEyQIH
+         TMWDbxDTFZBsMwGbJSem5SS6XXyRnSAPwRbAZFJObdOYxFcqXZjkcjGOfXKUDF3a08iC
+         +LP7UWWeE0Ai4xD87QsuFkgVMQQTilh9MvQjg=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=googlemail.com; s=gamma;
+        h=mime-version:date:message-id:subject:from:to:content-type;
+        b=po4hVyZhZhD2+vC5pmonWQW5/GVzhEU9kuffSogNpGVuifSfMQyKhiwmjObobDFVOT
+         nj0wtZp907UuAqSCw8/jQ8SeFwqla/vRhnopIEEMDnadtN8BMTxONckEBwQ5ynS2o7GF
+         2/9bkh82/HdIKCuSosPSGEXCaCIojnUyCd31s=
+MIME-Version: 1.0
+Received: by 10.86.52.1 with SMTP id z1mr3924023fgz.77.1279629664083; Tue, 20 
+	Jul 2010 05:41:04 -0700 (PDT)
+Received: by 10.223.118.69 with HTTP; Tue, 20 Jul 2010 05:41:04 -0700 (PDT)
+Date: Tue, 20 Jul 2010 13:41:04 +0100
+Message-ID: <AANLkTilcCHPT_ACoeM1nU-7TYcZVoDri5lV6KtYo2M9m@mail.gmail.com>
+Subject: sorry
+From: Kim Strudwick <kim.strudwick@googlemail.com>
+To: Seb <seb.bacon@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+
+mum called so i had to speak to them instead and now i need to eat
+some lunch and get back to work but will call you later to arrange
+meeting up. could meet you at st enoch around 6.15? x

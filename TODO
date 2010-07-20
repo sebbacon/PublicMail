@@ -1,0 +1,3 @@
+security: currently anyone could inject into thread by emailing a
+   special address based on hash of what they guess recipient's email
+   is.  hash it with secret key.

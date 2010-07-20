@@ -3,7 +3,7 @@ import hashlib
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.db.models import permalink
-
+from django.contrib.sites.models import Site
 
 class ProxyEmail(models.Model):
     def __init__(self, *args, **kwargs):
@@ -33,8 +33,15 @@ class ProxyEmail(models.Model):
     def __unicode__(self):
         return self.proxy_email
 
+class Organisation(models.Model):
+    name = models.CharField(max_length=120,
+                            unique=True)
+
 class CustomUser(User):
     proxy_email = models.ForeignKey(ProxyEmail)
+    organisation = models.ForeignKey(Organisation,
+                                     blank=True,
+                                     null=True)
     needs_moderation = models.BooleanField(default=True)
     
     objects = UserManager()
@@ -60,20 +67,17 @@ class CustomUser(User):
         super(CustomUser, self).save(*args, **kwargs)
 
 
-class Organisation(models.Model):
-    name = models.CharField(max_length=120,
-                            unique=True)
-
-class Recipient(models.Model):
-    email = models.EmailField(primary_key=True)
-    organisation = models.ForeignKey(Organisation,
-                                     blank=True,
-                                     null=True)
+def _make_message_id(message):
+    return "%s%s-%s" % (message.mfrom.proxy_email.proxy_email,
+                        message.pk,
+                        Site.objects.get_current().domain)
 
 class Mail(models.Model):
     subject = models.CharField(max_length=120)
-    mfrom = models.ForeignKey(CustomUser)
-    mto = models.ForeignKey(Recipient)
+    mfrom = models.ForeignKey(CustomUser,
+                              related_name="mfrom")
+    mto = models.ForeignKey(CustomUser,
+                            related_name="mto")
     message = models.TextField()
     in_reply_to = models.OneToOneField('self',
                                        blank=True,
@@ -83,7 +87,8 @@ class Mail(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     sent = models.DateTimeField(blank=True,
                                 null=True)
-
+    message_id = models.CharField(max_length=50)
+    
     @permalink
     def get_absolute_url(self):
         return ("mail", (self.id,))
@@ -93,3 +98,8 @@ class Mail(models.Model):
             yield Mail.objects.get(in_reply_to=self)
         except Mail.DoesNotExist:
             pass
+
+    def save(self, *args, **kwargs):
+        self.message_id = _make_message_id(self)
+        super(Mail, self).save(*args, **kwargs)
+
