@@ -1,9 +1,29 @@
 easy_install akismet
 
 create /etc/mailtrail-aliases:
- /trail-.*/      "/var/www/mailtrail/process_mail.py"
+ /trail-.*/      |"/var/www/mailtrail/process_mail.py"
 
 edit /etc/postfix/main.cf:
  alias_maps = hash:/var/lib/mailman/data/aliases, hash:/etc/aliases, regexp:/etc/mailtrail-aliases
 
 
+In /etc/postfix/transport:
+
+catchall@domain.com yourpipename:
+----
+(postmap /etc/postfix/transport)
+
+In main.cf:
+transport_maps = hash:/var/spool/postfix/plesk/transport, hash:/etc/postfix/transport
+----
+
+In master.cf:
+yourpipename unix - n n - - pipe flags=O user=apache:apache argv=/usr/bin/php -c /etc/php-cli.ini -q /var/www/vhosts/domain.com/httpdocs/system-files/mx.php ${recipient}
+----
+
+(beware that ${recipient} will be catchall@domain.com, so i suggest you gather the To: field from X-Original-To: field which will be added by postfix-pipe due to the "O" flag. 
+In the documentation says you can use ${original_recipient} instead of ${recipient} but it works if you have postfix 2.5 or greater )
+
+Now everytime a mail comes to catchall@domain.com it pipes to "yourpipename" in master.cf and does not store locally.
+
+And it works like a charm!
