@@ -70,6 +70,7 @@ def preview(request, message):
     if request.method == "POST":
         message.previewed = True
         message.save()
+        return redirect(reverse('home'))
     return locals()
 
 @render('login_or_register_form.html')
@@ -77,8 +78,10 @@ def login_or_register_form(request, message):
     message = Mail.objects.get(pk=message)
     if message.mfrom.has_usable_password():
         whichform = LoginForm
+        action = "login"
     else:
         whichform = RegisterForm
+        action = "register"
     if request.method == "POST":
         form = whichform(request.POST, request.FILES)
         if form.is_valid():

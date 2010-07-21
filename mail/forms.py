@@ -11,15 +11,19 @@ import settings
 class MessageForm(TemplatedForm):
     mto = forms.EmailField(
         required=True,
-        max_length=75)
+        max_length=75,
+        label="To:")
     mfrom = forms.EmailField(
         required=True,
-        max_length=75)
+        max_length=75,
+        label="From:")
     subject = forms.CharField(
-        required=True)
+        required=True,
+        label="Subject:")
     message = forms.CharField(
         required=True,
-        widget=forms.Textarea)
+        widget=forms.Textarea,
+        label="Message:")
 
     def __init__(self, request, *args, **kwargs):
         self.request = request

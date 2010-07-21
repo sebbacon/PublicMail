@@ -5,6 +5,8 @@
 
 <div id="loginform">
 
+ <p class="notice">Before you can send your message, please {% ifequal action "login" %}log in{% else %}register{% endifequal %}.</p>
+
  <form method="post">
   <table>
     {{ form }}

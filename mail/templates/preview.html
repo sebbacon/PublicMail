@@ -3,16 +3,15 @@
 
 {% block content %}
 
-To: {{ message.mto.email }}<br />
-From: {{ message.mfrom.email }}<br />
-Subject: {{ message.subject }}<br />
-Message:
-<p>{{ message.message }}</p>
+<p class="notice">Are you sure you want to send this email?</p>
 
+<div class="email preview">
+{% include "fragments/message.html" %}
+</div>
 
 <form method="post">
 
-<input type="submit" name="send email" />
+<input type="submit" value="send email" />
 
 </form>
 
