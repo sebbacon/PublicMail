@@ -59,9 +59,31 @@ def process_queue(request):
 
         
 @render('view_mail_thread.html')
-def view_mail_thread(request, message):
-    message = Mail.objects.get(pk=message)
-    return locals()
+def view_mail_thread(request, mail):
+    mail = Mail.objects.get(pk=mail)
+    start = mail.start_of_thread()
+    if request.method == "POST":
+        form = MessageForm(request, request.POST, request.FILES)
+        if form.is_valid():
+            message = form.save()
+            if request.user.is_anonymous():
+                return redirect(reverse('login_or_register_form',
+                                        kwargs={'message': message.pk}))
+            else:
+                return redirect(reverse('preview',
+                                        kwargs={'message': message.pk}))
+    else:
+        if request.user.is_anonymous():
+            form = MessageForm(request)
+        else:
+            form = MessageForm(request,
+                               initial={'mfrom':request.user.email})
+    if start == mail:
+        return locals()
+    else:
+        return redirect(reverse('mail',
+                                kwargs={'mail':start.id})\
+                        + "#message-%d" % mail.id)
 
 
 @render('preview.html')

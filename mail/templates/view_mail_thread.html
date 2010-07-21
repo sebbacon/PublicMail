@@ -2,13 +2,18 @@
 {% block title %}Preview your message{% endblock %}
 
 {% block content %}
-{% for message in message.all_in_thread %}
+{% for message in mail.all_in_thread %}
 <div class="email thread">
+<a name="message-{{message.id}}"></a>
 {% include "fragments/message.html" %}
 </div>
 {% endfor %}
 
-
+{% ifequal start.mfrom request.user %}
+ <hr />
+ <h2>Write a followup:</h2>
+ {% include "fragments/newmessage.html" %}
+{% endifequal %}
 
 {% endblock %}
 

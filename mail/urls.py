@@ -4,7 +4,7 @@ import views
 urlpatterns = patterns('mail',
     url(r'^$', views.home, name="home"),
     url(r'^write$', views.write, name="write"),
-    url(r'^mail/(?P<message>\w+)/$',
+    url(r'^mail/(?P<mail>\w+)/$',
         views.view_mail_thread,
         name="mail"),
     url(r'^preview/(?P<message>\w+)/$',

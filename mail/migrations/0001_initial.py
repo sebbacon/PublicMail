@@ -99,7 +99,7 @@ class Migration:
             'approved': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'in_reply_to': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['mail.Mail']", 'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'in_reply_to': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'replies'", 'blank': 'True', 'null': 'True', 'to': "orm['mail.Mail']"}),
             'message': ('django.db.models.fields.TextField', [], {}),
             'message_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'mfrom': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mfrom'", 'to': "orm['mail.CustomUser']"}),
