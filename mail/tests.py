@@ -13,6 +13,7 @@ from mail.models import CustomUser
 from mail.forms import MessageForm
 from mail.forms import Mail
 from process_mail import make_response_from_file
+from process_mail import EX_NOUSER, EX_SOFTWARE, EX_NOINPUT
 
 class MailTestCase(TestCase):
     def setUp(self):
@@ -209,7 +210,6 @@ class MailTestCase(TestCase):
         self.assertTrue(response)
         
         # now parse in an email that isn't a response to anything
-        response = email.message_from_file(
-            open("./testdata/mail2.txt", "r"))
+        fp = open("./testdata/mail2.txt", "r")
         response = make_response_from_file(fp)
-        self.assertFalse(response)
+        self.assertEqual(response, EX_NOUSER)

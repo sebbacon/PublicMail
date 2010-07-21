@@ -20,6 +20,12 @@ from mail.models import Organisation
 from mail.models import CustomUser
 from mail.models import Mail
 
+# Postfix error codes:
+EX_NOINPUT = 66 # Cannot open input
+EX_NOUSER = 67 # Addressee unknown
+EX_SOFTWARE = 70 # Internal software error
+
+
 def get_charset(message, default="ascii"):
     """Get the message charset"""
     if message.get_content_charset():
@@ -30,9 +36,22 @@ def get_charset(message, default="ascii"):
 
 def make_response_from_file(fp):
     parsed_email = email.message_from_file(fp)
+    logging.debug("Received email\n--------\n%s--------\n"\
+                  % parsed_email.as_string())
+    try:
+        return make_response_from_email(parsed_email)
+    except (KeyError, AttributeError):
+        logging.error("Couldn't handle\n--------\n%s--------\n"\
+                      % parsed_email.as_string())
+        return EX_SOFTWARE
+        
+def make_response_from_email(parsed_email):
     name, mto = parseaddr(parsed_email['to'])
     proxy_email_id = mto[:mto.find("@")]
     proxy_email_id = proxy_email_id.replace(settings.MAIL_PREFIX, "")
+    message_id = parsed_email['message-id']\
+                 .replace("<", "")\
+                 .replace(">", "")
     logging.debug("Looking for proxy_email of %s" % proxy_email_id)
     try:
         user = CustomUser.objects.get(proxy_email_id=proxy_email_id)
@@ -46,10 +65,9 @@ def make_response_from_file(fp):
         tmp = []
         for ref in references:
             tmp.append(ref.replace("<", "").replace(">", ""))
-        message_id = parsed_email['message-id']\
-                     .replace("<", "")\
-                     .replace(">", "")
         references = tmp
+        logging.debug("Possible references in thread: %s"\
+                      % ", ".join(ref))
         in_reply_to = None
         for ref in references:
             try:
@@ -58,7 +76,7 @@ def make_response_from_file(fp):
             except Mail.DoesNotExist:
                 continue
         # XXX in here, we should do some heuristics to thread on
-        # Subject
+        # Subject in the case where in_reply_to wasn't found
         # - strip Re:, RE:, RE[5]:, "Re: Re" etc first
         if in_reply_to:
             name, mfrom = parseaddr(parsed_email['from'])
@@ -97,15 +115,17 @@ def make_response_from_file(fp):
                                          in_reply_to=in_reply_to,
                                          message_id=message_id)
             return newmsg
+        else:
+            logging.warn("Couldn't find thread for %s" % message_id)
+            return EX_SOFTWARE 
+
     except CustomUser.DoesNotExist:
-        print "couldn't find addressee"
-        return False
+        logging.warn("Couldn't find addressee %s" % message_id)
+        return EX_NOUSER 
 
 if __name__ == "__main__":
     parsed_email = make_response_from_file(sys.stdin)
-    if parsed_email:
+    if isinstance(parsed_email, Mail):
         sys.exit(0)
     else:
-        sys.exit(67) # addressee unknown
-
-# Internal software error = 7-
+        sys.exit(parsed_email)
