@@ -20,6 +20,7 @@ from email.utils import parseaddr
 from mail.models import Organisation
 from mail.models import CustomUser
 from mail.models import Mail
+from utils import send_mail
 
 # Postfix error codes:
 EX_NOINPUT = 66 # Cannot open input
@@ -112,8 +113,6 @@ def make_response_from_email(parsed_email):
                 counter += 1
                 # XXX the following needs to change to save all parts
                 # of a message
-                # for unicoding stuff, see
-                # http://ginstrom.com/scribbles/2007/11/19/parsing-multilingual-email-with-python/ 
                 if part.get_content_type() == "text/plain":
                     charset = get_charset(part, get_charset(parsed_email))
                     message = unicode(part.get_payload(decode=True),
@@ -128,6 +127,11 @@ def make_response_from_email(parsed_email):
                                          message=message,
                                          in_reply_to=in_reply_to,
                                          message_id=message_id)
+            send_mail(message=newmsg.message,
+                      subject=newmsg.subject,
+                      mfrom=newmsg.mfrom.email,                      
+                      mto=newmsg.mto.email,
+                      reply_to=newmsg.mfrom.proxy_email)
             return newmsg
         else:
             logging.warn("Couldn't find thread for %s" % message_id)

@@ -48,7 +48,8 @@ def send_mail(message=None,
               subject=None,
               mfrom=None,
               mto=None,
-              message_id=None):
+              message_id=None,
+              reply_to=None):
     """Send an email with the standard unsubscribe footer
     """
     
@@ -57,11 +58,16 @@ def send_mail(message=None,
                               {'site':site})
     message = "%s\n\n%s" % (message,
                             footer)
+    headers = {}
+    if message_id:
+        headers['Message-ID'] = message_id
+    if reply_to:
+        headers['Reply-To'] = reply_to
     email = EmailMessage(subject,
                          message,
                          mfrom,
                          [mto],
-                         headers={'Message-ID':message_id})
+                         headers=headers)
     return email.send()
 
 class render:

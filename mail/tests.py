@@ -40,10 +40,11 @@ class MailTestCase(TestCase):
         c = Client()
         self.assertEqual(message1.childwalk().next(), message2)
         response = c.get(reverse('mail',
-                                 kwargs={'message':message1.pk}))
+                                 kwargs={'mail':message1.pk}))
         self.assertContains(response, "tiddly pom")
         response = c.get(reverse('mail',
-                                 kwargs={'message':message2.pk}))
+                                 kwargs={'mail':message2.pk}),
+                         follow=True)
         self.assertContains(response, "life of a bear")
         
 
@@ -76,9 +77,24 @@ class MailTestCase(TestCase):
         reply_fp = StringIO(mail.outbox[-1].message().as_string())
         response = make_response_from_file(reply_fp)
         self.assertTrue(response)
+        # this was like a different person at the same company
+        # replying to the message -- let's check that while we're here
+        couser1 = CustomUser.objects.get(email='1@baz.com')
+        couser2 = CustomUser.objects.get(email='11@baz.com')
+        self.assertEqual(couser1.organisation, couser2.organisation)
 
+        # two emails should have been created, threaded together
         mails = Mail.objects.order_by('created')
         self.assertEqual(mails[0].childwalk().next(), mails[1])
+
+        # and an email should have been sent to the original sender,
+        # with a proxied reply-to address
+        self.assertEqual(mail.outbox[-1].to[0],
+                         user.email)
+        self.assertEqual(mail.outbox[-1].from_email,
+                         couser2.email)
+        self.assertEqual(mail.outbox[-1].extra_headers['Reply-To'],
+                         couser2.proxy_email)
 
     def testCustomUserModelProxy(self):
         user = CustomUser.objects.create(email="bar@baz.com",
