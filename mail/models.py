@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 
 from django.db import models
 from django.contrib.auth.models import User, UserManager
@@ -76,10 +77,10 @@ class Mail(models.Model):
     mto = models.ForeignKey(CustomUser,
                             related_name="mto")
     message = models.TextField()
-    in_reply_to = models.OneToOneField('self',
-                                       related_name="reply",
-                                       blank=True,
-                                       null=True)
+    in_reply_to = models.ForeignKey('self',
+                                    related_name="replies",
+                                    blank=True,
+                                    null=True)
     previewed = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -91,16 +92,17 @@ class Mail(models.Model):
     def get_absolute_url(self):
         return ("mail", (self.id,))
 
+    def childwalk(self):
+        for child in self.replies.all():
+            if child.replies.count():
+                for subchild in child.childwalk():
+                    yield subchild
+            else:
+                yield child
+
     def all_in_thread(self):
         node = self.start_of_thread()
-        all_nodes = [node]
-        try:
-            while True:
-                node = node.reply
-                all_nodes.append(node)
-        except Mail.DoesNotExist:
-            pass
-        return all_nodes
+        return itertools.chain([node], node.childwalk())
     
     def start_of_thread(self):
         node = self

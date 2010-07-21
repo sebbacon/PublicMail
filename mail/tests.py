@@ -38,13 +38,13 @@ class MailTestCase(TestCase):
         message1.save()
         message2.save()
         c = Client()
+        self.assertEqual(message1.childwalk().next(), message2)
         response = c.get(reverse('mail',
                                  kwargs={'message':message1.pk}))
         self.assertContains(response, "tiddly pom")
         response = c.get(reverse('mail',
                                  kwargs={'message':message2.pk}))
         self.assertContains(response, "life of a bear")
-
         
 
     def testSendAndReply(self):
@@ -78,7 +78,7 @@ class MailTestCase(TestCase):
         self.assertTrue(response)
 
         mails = Mail.objects.order_by('created')
-        self.assertEqual(mails[0].reply, mails[1])
+        self.assertEqual(mails[0].childwalk().next(), mails[1])
 
     def testCustomUserModelProxy(self):
         user = CustomUser.objects.create(email="bar@baz.com",
@@ -198,14 +198,14 @@ class MailTestCase(TestCase):
 
         # now we simulate a reply, and override a couple of relevant
         # headers 
-        response = email.message_from_file(
+        raw_email = email.message_from_file(
             open("./testdata/mail4.txt", "r"))
         new_mto = user.proxy_email
-        response.replace_header('in-reply-to', "<%s>" % message.message_id)
-        response.replace_header('references', "<%s>" % message.message_id)
-        response.replace_header('to', "%s <%s>" % (message.message_id,
+        raw_email.replace_header('in-reply-to', "<%s>" % message.message_id)
+        raw_email.replace_header('references', "<%s>" % message.message_id)
+        raw_email.replace_header('to', "%s <%s>" % (message.message_id,
                                       new_mto))
-        fp = StringIO(response.as_string()) 
+        fp = StringIO(raw_email.as_string()) 
         response = make_response_from_file(fp)
         self.assertTrue(response)
         
@@ -213,3 +213,16 @@ class MailTestCase(TestCase):
         fp = open("./testdata/mail2.txt", "r")
         response = make_response_from_file(fp)
         self.assertEqual(response, EX_NOUSER)
+
+        # and now try threading based on subject line as a fallback...
+        raw_email = email.message_from_file(
+            open("./testdata/mail2.txt", "r"))
+        new_mto = user.proxy_email
+        del(raw_email['in-reply-to'])
+        del(raw_email['references'])
+        raw_email.replace_header('subject', "Re:RE: re:%s" % message.subject)
+        raw_email.replace_header('to', "%s <%s>" % (message.message_id,
+                                      new_mto))
+        fp = StringIO(raw_email.as_string()) 
+        response = make_response_from_file(fp)
+        self.assertTrue(response)

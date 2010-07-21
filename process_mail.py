@@ -6,6 +6,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
+import re
 import logging
 
 logging.basicConfig(level=logging.DEBUG,
@@ -36,12 +37,12 @@ def get_charset(message, default="ascii"):
 
 def make_response_from_file(fp):
     parsed_email = email.message_from_file(fp)
-    logging.debug("Received email\n--------\n%s--------\n"\
+    logging.debug("Received email\n--------\n%s\n--------"\
                   % parsed_email.as_string())
     try:
         return make_response_from_email(parsed_email)
     except (KeyError, AttributeError):
-        logging.error("Couldn't handle\n--------\n%s--------\n"\
+        logging.error("Couldn't handle\n--------\n%s\n--------"\
                       % parsed_email.as_string())
         return EX_SOFTWARE
         
@@ -58,7 +59,8 @@ def make_response_from_email(parsed_email):
         in_reply_to = None
 
         # http://www.jwz.org/doc/threading.html
-        references = parsed_email.get('references','').split(" ")
+        references = parsed_email.get('references','')
+        references = references and references.split(" ") or []
         in_reply_to_id = parsed_email.get('in-reply-to','')
         if in_reply_to_id:
             references.append(in_reply_to_id)
@@ -67,7 +69,7 @@ def make_response_from_email(parsed_email):
             tmp.append(ref.replace("<", "").replace(">", ""))
         references = tmp
         logging.debug("Possible references in thread: %s"\
-                      % ", ".join(ref))
+                      % ", ".join(references))
         in_reply_to = None
         for ref in references:
             try:
@@ -75,9 +77,21 @@ def make_response_from_email(parsed_email):
                     message_id=ref)
             except Mail.DoesNotExist:
                 continue
-        # XXX in here, we should do some heuristics to thread on
-        # Subject in the case where in_reply_to wasn't found
-        # - strip Re:, RE:, RE[5]:, "Re: Re" etc first
+        if not in_reply_to:
+            # take all the emails that this user has initiated, and
+            # find ones with the same subject.  sort them by date and
+            # stick this in at the appropriate point.
+            re_re = r"^([rR][eE](\[[0-9]\])*: *)*"
+            base_subject = re.sub(re_re, "", parsed_email['subject']) 
+            thread_starts = Mail.objects.filter(
+                mfrom=user,
+                in_reply_to=None,
+                subject__contains=base_subject)
+            try:
+                in_reply_to = thread_starts[0]
+            except IndexError:
+                pass
+            
         if in_reply_to:
             name, mfrom = parseaddr(parsed_email['from'])
             mfrom, created = CustomUser.objects.get_or_create(email=mfrom)
