@@ -92,6 +92,13 @@ class Mail(models.Model):
     def get_absolute_url(self):
         return ("mail", (self.id,))
 
+    def __unicode__(self):
+        reply_to_msgid = self.in_reply_to \
+                         and self.in_reply_to.message_id
+        return "%s <%s> in reply to <%s>" % (self.subject,
+                                             self.message_id,
+                                             reply_to_msgid)
+
     def childwalk(self):
         for child in self.replies.all():
             if child.replies.count():
@@ -100,9 +107,14 @@ class Mail(models.Model):
             else:
                 yield child
 
+    def ordered_childwalk(self):
+        thread = list(self.childwalk())
+        thread.sort(lambda x,y: cmp(x.created, y.created))
+        return thread
+    
     def all_in_thread(self):
         node = self.start_of_thread()
-        return itertools.chain([node], node.childwalk())
+        return itertools.chain([node], node.ordered_childwalk())
     
     def start_of_thread(self):
         node = self
@@ -114,6 +126,13 @@ class Mail(models.Model):
             node = parent
         return node
 
+    def end_of_thread(self):
+        if self.replies.count():
+            thread = self.ordered_childwalk()
+            return thread[-1]
+        else:
+            return self
+        
     def save(self, *args, **kwargs):
         self.message_id = _make_message_id(self)
         super(Mail, self).save(*args, **kwargs)

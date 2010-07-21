@@ -11,6 +11,7 @@ from forms import RegisterForm
 from forms import MessageForm
 from models import Mail
 
+
 @render('home.html')
 def home(request):
     return redirect(reverse('write'))
@@ -66,6 +67,8 @@ def view_mail_thread(request, mail):
         form = MessageForm(request, request.POST, request.FILES)
         if form.is_valid():
             message = form.save()
+            message.in_reply_to = start.end_of_thread()
+            message.save()
             if request.user.is_anonymous():
                 return redirect(reverse('login_or_register_form',
                                         kwargs={'message': message.pk}))
@@ -77,7 +80,9 @@ def view_mail_thread(request, mail):
             form = MessageForm(request)
         else:
             form = MessageForm(request,
-                               initial={'mfrom':request.user.email})
+                               initial={'mfrom':request.user.email,
+                                        'mto':start.mto.email,
+                                        'subject':'Re: %s' % start.subject})
     if start == mail:
         return locals()
     else:

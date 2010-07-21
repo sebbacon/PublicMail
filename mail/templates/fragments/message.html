@@ -1,14 +1,25 @@
 <table class="email">
- <tr class="to">
-   <th>To:</th>
-   <td>{{ message.mto.email }}</td>
- </tr>
- <tr class="subject">
-   <th>Subject:</th>
-   <td>{{ message.subject }}</td>
- </tr>
- <tr class="message">
-   <td></td>
-   <td>{{ message.message|linebreaks }}</td>
- </tr>
+ <thead>
+  <tr class="from">
+    <th>From:</th>
+    <td class="content-col">{{ message.mfrom.email }}</td>
+  </tr>
+  <tr class="to">
+    <th>To:</th>
+    <td>{{ message.mto.email }}</td>
+  </tr>
+  <tr class="date">
+    <th>Date:</th>
+    <td>{{ message.created|date:"d M, Y H:m" }}</td>
+  </tr>
+  <tr class="subject">
+    <th>Subject:</th>
+    <td>{{ message.subject }}</td>
+  </tr>
+ </thead>
+ <tbody>
+  <tr class="message">
+    <td colspan="2">{{ message.message}} </td>
+  </tr>
+ </tbody>
 </table>

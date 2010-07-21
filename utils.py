@@ -2,6 +2,7 @@ from urlparse import urlparse
 from cgi import parse_qs
 import urllib
 import hashlib
+import re
 
 import time
 import datetime
@@ -43,6 +44,11 @@ class TemplatedForm(forms.Form):
             data.setlist(k, new_vs)
         self.data = data
         super(TemplatedForm, self).full_clean()
+
+def strip_re(subject):
+    re_re = r"^([rR][eE](\[[0-9]\])*: *)*"
+    base_subject = re.sub(re_re, "", subject) 
+    return base_subject
 
 def send_mail(message=None,
               subject=None,

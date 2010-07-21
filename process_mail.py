@@ -6,7 +6,6 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-import re
 import logging
 
 logging.basicConfig(level=logging.DEBUG,
@@ -21,6 +20,7 @@ from mail.models import Organisation
 from mail.models import CustomUser
 from mail.models import Mail
 from utils import send_mail
+from utils import strip_re
 
 # Postfix error codes:
 EX_NOINPUT = 66 # Cannot open input
@@ -82,8 +82,8 @@ def make_response_from_email(parsed_email):
             # take all the emails that this user has initiated, and
             # find ones with the same subject.  sort them by date and
             # stick this in at the appropriate point.
-            re_re = r"^([rR][eE](\[[0-9]\])*: *)*"
-            base_subject = re.sub(re_re, "", parsed_email['subject']) 
+            base_subject = strip_re(parsed_email['subject'])
+            logging.debug("Trying subject heuristics")
             thread_starts = Mail.objects.filter(
                 mfrom=user,
                 in_reply_to=None,
@@ -127,6 +127,8 @@ def make_response_from_email(parsed_email):
                                          message=message,
                                          in_reply_to=in_reply_to,
                                          message_id=message_id)
+            logging.debug("Sending notification to %s, from %s" \
+                          % (newmsg.mto.email, newmsg.mfrom.email))
             send_mail(message=newmsg.message,
                       subject=newmsg.subject,
                       mfrom=newmsg.mfrom.email,                      

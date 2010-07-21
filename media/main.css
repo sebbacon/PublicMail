@@ -10,7 +10,7 @@ body {
 
 
 h1, h2, h3, h4, h5, h5 {
- color: white;
+ color: black;
  font-weight: normal;
  margin: 0;
  padding: 0;
@@ -77,3 +77,35 @@ p.helptext {
  margin-top:3px;
 }
 
+table.email tr.message td {
+ white-space: pre-wrap;
+}
+
+table.email .content-col {
+ width: 95%;
+}
+
+table.email thead {
+ background-color: #C3D9FF;
+}
+
+table.email thead tr td,
+table.email thead tr th {
+ padding: 0;
+ margin: 0;
+}
+
+table.email th,
+table.email tr.to,
+table.email tr.subject,
+table.email tr.date,
+table.email tr.from {
+ color: gray;
+}
+
+div.email {
+ width: 70%;
+ margin: 30px;
+ border-radius: 5px;
+ border: solid #C3D9FF 3px;
+}

@@ -3,7 +3,7 @@
 
 {% block content %}
 {% for message in mail.all_in_thread %}
-<div class="email thread">
+<div class="email thread {% cycle 'even' 'odd' %}">
 <a name="message-{{message.id}}"></a>
 {% include "fragments/message.html" %}
 </div>
