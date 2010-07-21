@@ -7,27 +7,12 @@ class Migration:
     
     def forwards(self, orm):
         
-        # Adding model 'ProxyEmail'
-        db.create_table('mail_proxyemail', (
-            ('proxy_email', orm['mail.ProxyEmail:proxy_email']),
-        ))
-        db.send_create_signal('mail', ['ProxyEmail'])
-        
         # Adding model 'Organisation'
         db.create_table('mail_organisation', (
             ('id', orm['mail.Organisation:id']),
             ('name', orm['mail.Organisation:name']),
         ))
         db.send_create_signal('mail', ['Organisation'])
-        
-        # Adding model 'CustomUser'
-        db.create_table('mail_customuser', (
-            ('user_ptr', orm['mail.CustomUser:user_ptr']),
-            ('proxy_email', orm['mail.CustomUser:proxy_email']),
-            ('organisation', orm['mail.CustomUser:organisation']),
-            ('needs_moderation', orm['mail.CustomUser:needs_moderation']),
-        ))
-        db.send_create_signal('mail', ['CustomUser'])
         
         # Adding model 'Mail'
         db.create_table('mail_mail', (
@@ -45,21 +30,27 @@ class Migration:
         ))
         db.send_create_signal('mail', ['Mail'])
         
+        # Adding model 'CustomUser'
+        db.create_table('mail_customuser', (
+            ('user_ptr', orm['mail.CustomUser:user_ptr']),
+            ('proxy_email_id', orm['mail.CustomUser:proxy_email_id']),
+            ('organisation', orm['mail.CustomUser:organisation']),
+            ('needs_moderation', orm['mail.CustomUser:needs_moderation']),
+        ))
+        db.send_create_signal('mail', ['CustomUser'])
+        
     
     
     def backwards(self, orm):
         
-        # Deleting model 'ProxyEmail'
-        db.delete_table('mail_proxyemail')
-        
         # Deleting model 'Organisation'
         db.delete_table('mail_organisation')
         
-        # Deleting model 'CustomUser'
-        db.delete_table('mail_customuser')
-        
         # Deleting model 'Mail'
         db.delete_table('mail_mail')
+        
+        # Deleting model 'CustomUser'
+        db.delete_table('mail_customuser')
         
     
     
@@ -101,7 +92,7 @@ class Migration:
         'mail.customuser': {
             'needs_moderation': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'organisation': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.Organisation']", 'null': 'True', 'blank': 'True'}),
-            'proxy_email': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mail.ProxyEmail']"}),
+            'proxy_email_id': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'mail.mail': {
@@ -120,9 +111,6 @@ class Migration:
         'mail.organisation': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '120', 'unique': 'True'})
-        },
-        'mail.proxyemail': {
-            'proxy_email': ('django.db.models.fields.CharField', [], {'max_length': '10', 'primary_key': 'True'})
         }
     }
     

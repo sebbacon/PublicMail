@@ -5,46 +5,47 @@ from django.contrib.auth.models import User, UserManager
 from django.db.models import permalink
 from django.contrib.sites.models import Site
 
-class ProxyEmail(models.Model):
-    def __init__(self, *args, **kwargs):
-        """Automatically generate a unique email user portion
-        """
-        try:
-            email = kwargs.pop('email')
-            super(ProxyEmail, self).__init__(*args, **kwargs)
-            proxy_email = None
-            n = 0
-            while not proxy_email:
-                h = hashlib.sha256(email)
-                attempt = h.hexdigest()[n:n+6]
-                try:
-                    already_got = ProxyEmail.objects.get(
-                        proxy_email=attempt)
-                    n += 1
-                except ProxyEmail.DoesNotExist:
-                    proxy_email = attempt
-            self.proxy_email = proxy_email
-        except KeyError:
-            super(ProxyEmail, self).__init__(*args, **kwargs)
-        
-    proxy_email = models.CharField(primary_key=True,
-                                   max_length=10)
-
-    def __unicode__(self):
-        return self.proxy_email
+import settings
 
 class Organisation(models.Model):
     name = models.CharField(max_length=120,
                             unique=True)
 
 class CustomUser(User):
-    proxy_email = models.ForeignKey(ProxyEmail)
+    proxy_email_id = models.CharField(max_length=10)
     organisation = models.ForeignKey(Organisation,
                                      blank=True,
                                      null=True)
     needs_moderation = models.BooleanField(default=True)
     
     objects = UserManager()
+
+    def __init__(self, *args, **kwargs):
+        """Automatically generate a unique email user portion
+        """
+        try:
+            email = kwargs['email']
+            super(CustomUser, self).__init__(*args, **kwargs)
+            proxy_email_id = None
+            n = 0
+            while not proxy_email_id:
+                h = hashlib.sha256(email)
+                attempt = h.hexdigest()[n:n+6]
+                try:
+                    already_got = CustomUser.objects.get(
+                        proxy_email_id=attempt)
+                    n += 1
+                except CustomUser.DoesNotExist:
+                    proxy_email_id = attempt
+            self.proxy_email_id = proxy_email_id
+        except KeyError:
+            super(CustomUser, self).__init__(*args, **kwargs)
+        
+    @property
+    def proxy_email(self):
+        return "%s%s@%s" % (settings.MAIL_PREFIX,
+                            self.proxy_email_id,
+                            settings.MAIL_DOMAIN)
 
     @property
     def display_name(self):
@@ -54,22 +55,18 @@ class CustomUser(User):
             name = self.email
         return name
     
+        
     def __unicode__(self):
         return "%s (%s)" % (self.email, self.proxy_email)
-    
+
     @permalink
     def get_absolute_url(self):
         return ("user", (self.id,))
 
-    def save(self, *args, **kwargs):
-        self.proxy_email = ProxyEmail.objects.create(
-            email=self.email)
-        super(CustomUser, self).save(*args, **kwargs)
-
 
 def _make_message_id(message):
-    return "%s%s-%s" % (message.mfrom.proxy_email.proxy_email,
-                        message.pk,
+    return "%s%s-%s" % (message.mfrom.proxy_email,
+                        message.id,
                         Site.objects.get_current().domain)
 
 class Mail(models.Model):
@@ -80,6 +77,7 @@ class Mail(models.Model):
                             related_name="mto")
     message = models.TextField()
     in_reply_to = models.OneToOneField('self',
+                                       related_name="reply",
                                        blank=True,
                                        null=True)
     previewed = models.BooleanField(default=False)
@@ -93,11 +91,26 @@ class Mail(models.Model):
     def get_absolute_url(self):
         return ("mail", (self.id,))
 
-    def next_in_thread(self):
+    def all_in_thread(self):
+        node = self.start_of_thread()
+        all_nodes = [node]
         try:
-            yield Mail.objects.get(in_reply_to=self)
+            while True:
+                node = node.reply
+                all_nodes.append(node)
         except Mail.DoesNotExist:
             pass
+        return all_nodes
+    
+    def start_of_thread(self):
+        node = self
+        parent = node
+        while True:
+            parent = node.in_reply_to
+            if not parent:
+                break
+            node = parent
+        return node
 
     def save(self, *args, **kwargs):
         self.message_id = _make_message_id(self)

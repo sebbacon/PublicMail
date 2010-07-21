@@ -1,16 +1,24 @@
 #!/usr/bin/env python
-import string
-import mimetypes
-import os; os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 import sys
+sys.path.append("/home/seb/Code/")
+import os; os.environ["DJANGO_SETTINGS_MODULE"] = "mailtrail.settings"
+from django.core.management import setup_environ
+import settings
+setup_environ(settings)
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(message)s',
+                    filename="/tmp/mailtrail.log",
+                    filemode="w")
+
 import email
 from email.utils import parseaddr
 
 from mail.models import Organisation
-from mail.models import ProxyEmail
 from mail.models import CustomUser
 from mail.models import Mail
-import settings
 
 def get_charset(message, default="ascii"):
     """Get the message charset"""
@@ -23,18 +31,18 @@ def get_charset(message, default="ascii"):
 def make_response_from_file(fp):
     parsed_email = email.message_from_file(fp)
     name, mto = parseaddr(parsed_email['to'])
-    user = mto[:mto.find("@")]
-    user = user.replace(settings.MAIL_PREFIX, "")
+    proxy_email_id = mto[:mto.find("@")]
+    proxy_email_id = proxy_email_id.replace(settings.MAIL_PREFIX, "")
+    logging.debug("Looking for proxy_email of %s" % proxy_email_id)
     try:
-        proxy = ProxyEmail.objects.get(proxy_email=user)
-        user = proxy.customuser_set.get()
+        user = CustomUser.objects.get(proxy_email_id=proxy_email_id)
         in_reply_to = None
 
         # http://www.jwz.org/doc/threading.html
         references = parsed_email.get('references','').split(" ")
-        in_reply_to = parsed_email.get('in-reply-to','')
-        if in_reply_to:
-            references.append(in_reply_to)
+        in_reply_to_id = parsed_email.get('in-reply-to','')
+        if in_reply_to_id:
+            references.append(in_reply_to_id)
         tmp = []
         for ref in references:
             tmp.append(ref.replace("<", "").replace(">", ""))
@@ -42,22 +50,26 @@ def make_response_from_file(fp):
                      .replace("<", "")\
                      .replace(">", "")
         references = tmp
+        in_reply_to = None
         for ref in references:
             try:
                 in_reply_to = Mail.objects.get(
                     message_id=ref)
             except Mail.DoesNotExist:
                 continue
+        # XXX in here, we should do some heuristics to thread on
+        # Subject
+        # - strip Re:, RE:, RE[5]:, "Re: Re" etc first
         if in_reply_to:
             name, mfrom = parseaddr(parsed_email['from'])
             mfrom, created = CustomUser.objects.get_or_create(email=mfrom)
             if created:
                 if not in_reply_to.mto.organisation:
-                    name = mfrom[mfrom.find('@')+1:]
+                    name = mfrom.email[mfrom.email.find('@')+1:]
                     in_reply_to.mto.organisation = \
                                Organisation.objects.create(name=name)
                     in_reply_to.mto.save()
-                mfrom.organisation = mto.organisation.save()
+                mfrom.organisation = in_reply_to.mto.organisation
                 mfrom.save()
             mto = user
             counter = 1
@@ -85,7 +97,7 @@ def make_response_from_file(fp):
                                          in_reply_to=in_reply_to,
                                          message_id=message_id)
             return newmsg
-    except ProxyEmail.DoesNotExist:
+    except CustomUser.DoesNotExist:
         print "couldn't find addressee"
         return False
 

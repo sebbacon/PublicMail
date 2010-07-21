@@ -68,6 +68,7 @@ class MessageForm(TemplatedForm):
             mto=recipient,
             message=self.cleaned_data['message'],
             approved=not user.needs_moderation)
+        message.save() # for some reason, needed to set id
         return message
 
     
