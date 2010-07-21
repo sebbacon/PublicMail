@@ -100,6 +100,12 @@ AUTHENTICATION_BACKENDS = ('backends.StandardBackend',
                            'django.contrib.auth.backends.ModelBackend',
                            )
 GOOGLE_ANALYTICS_ID = ""
+AKISMET_KEY = ""
+MAIL_PREFIX = "trail-"
+MAIL_DOMAIN = "seb-laptop.com"
+
+TEST_RUNNER = "test_with_coverage.run_tests"
+COVERAGE_MODULES = ["mail.views", "mail.models", "mail.forms", "process_mail"]
 
 try:
     from local_settings import *
