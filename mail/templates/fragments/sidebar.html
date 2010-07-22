@@ -1,0 +1,38 @@
+{% load extras %}
+ {% if request.user.is_anonymous %}
+ <div id="welcome">
+   <h2>Welcome to {{ app_name }}!</h2>
+   <p>{{ app_name }} is a simple way to have conversations in public.  Here's how it works:</p>
+   </p>
+   <ol>
+    <li>Start a conversation via the website</li>
+    <li>We send your message by email to the recipient</li>
+    <li>Continue your conversation by email</li>
+    <li>The conversation is automatically published on its own web page</li>
+   </ol>
+   <h2 id="startbutton">Get started now!</h2>
+ </div>
+ {% endif %}
+ <div id="inbox">
+ {% if mails %}
+ <h3>{% if request.user.is_anonymous %}Recent public{% else %}Your{% endif %} conversations</h3>
+ <table>
+ {% for mail in mails %}
+   <tr>
+     <td>
+       {% if not mail.approved %}<a title="this message needs confirming by email (check your inbox)">!</a>{% endif %}
+     </td>
+    {% if not user.is_anonymous  %} 
+     <td>{{ mail.mto.email }}</td>
+    {% endif %}
+     <td>
+       <a href="{{ mail.get_absolute_url }}">{{ mail.subject }}</a>
+     </td>
+     <td>
+       {{ mail.created|naturalTimeDifference}}
+     </td>
+   </tr>
+ {% endfor %}
+ </table>
+ {% endif %}
+ </div>

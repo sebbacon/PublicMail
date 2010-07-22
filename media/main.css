@@ -3,8 +3,7 @@ html {font-size:100.01%;}
 body { 
   font-size:85%;
   font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
-  background-color: lightgray;
-  color: #333;
+  background-color: #eee;
 }
 
 
@@ -18,9 +17,12 @@ h1, h2, h3, h4, h5, h5 {
 }
 
 #main {
- border: solid #1e2038 5px;
- background: white;
- color: darkblue;
+ background: #eee;
+ color: black;
+}
+
+a {
+ color: #006e96;
 }
 
 #header {
@@ -77,35 +79,145 @@ p.helptext {
  margin-top:3px;
 }
 
-table.email tr.message td {
+div.message {
  white-space: pre-wrap;
 }
 
-table.email .content-col {
- width: 95%;
+div.email span.label {
+ display: block;
+ float: left;
+ width: 5em;
 }
 
-table.email thead {
+div.email div.header {
  background-color: #C3D9FF;
-}
-
-table.email thead tr td,
-table.email thead tr th {
- padding: 0;
- margin: 0;
-}
-
-table.email th,
-table.email tr.to,
-table.email tr.subject,
-table.email tr.date,
-table.email tr.from {
  color: gray;
 }
 
+div.email div.headers {
+ padding: 0 10px 10px 10px;
+}
 div.email {
- width: 70%;
- margin: 30px;
  border-radius: 5px;
  border: solid #C3D9FF 3px;
+}
+
+div.email div.anchor {
+ float: left;
+}
+
+div.email div.anchor a {
+ text-decoration: none;
+ color: #C3D9FF;
+}
+
+.visible {
+ color: red!important;
+}
+
+div#inbox table  {
+ padding: 0;
+}
+
+div#inbox table tr td {
+ background: transparent url(horizontal_line.png) no-repeat;
+}
+
+ul.messages {
+ margin: 0;
+ padding: 0;
+}
+
+ul.messages li {
+ list-style: none;
+}
+
+.error, .notice, .success, .info, .warning {padding:.8em;margin-bottom:1em;border:2px solid #ddd;}
+.error, .warning {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
+.notice, .info {background:#FFF6BF;color:#514721;border-color:#FFD324;}
+.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
+.error a {color:#8a1f11;}
+.notice a {color:#514721;}
+.success a {color:#264409;}
+
+textarea {
+ width: 90%;
+}
+
+div.headers div.extra {
+ display: none;
+}
+
+div.headers div.from {
+ cursor: pointer; 
+ cursor: hand;
+}
+
+div.mailheader {
+ background: transparent url(letter.png);
+ height: 10px;
+}
+
+div#pages ul li {
+ color: #006e96;
+}
+
+div.rightcol {
+ color: #006e96;
+}
+
+div.rightcol p {
+ margin-top: 20px;
+}
+
+div.rightcol ol {
+ font-size: 1.3em;
+}
+
+div.rightcol h2,
+div.rightcol h3 {
+ background: transparent url(bluegrad.png) repeat-x; 
+ color: white;
+ padding: 5px;
+ font-weight: bolder;
+ margin-left: -20px;
+ margin-top: 20px;
+}
+
+h2#startbutton {
+ background: transparent url(redbuttonleft.png) no-repeat; 
+ padding-left: 35px;
+
+}
+
+div#newmessage {
+ background-color: white;
+}
+
+div#mailthread {
+ padding: 10px;
+}
+
+div.mail {
+ background-color: white;
+}
+
+table.mailbody {
+  padding: 10px;
+}
+
+table.mailbody th,
+table.mailbody td {
+ padding: 0;
+ vertical-align: top;
+}
+
+table.mailbody input {
+ margin: 5px;
+}
+
+#stamp {
+ position: absolute;
+ margin-left: 390px;
+ margin-top: 10px;
 }

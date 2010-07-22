@@ -1,5 +1,8 @@
 from django.contrib.auth import authenticate
 from django import forms
+from django.template.loader import render_to_string
+from django.contrib.sites.models import Site
+from django.core.mail import EmailMessage
 
 from akismet import Akismet
 
@@ -8,26 +11,29 @@ from models import Mail
 from utils import TemplatedForm
 import settings
 
-class MessageForm(TemplatedForm):
+class MailForm(TemplatedForm):
     mto = forms.EmailField(
         required=True,
         max_length=75,
+        widget=forms.TextInput(attrs={'size':35}),
         label="To:")
     mfrom = forms.EmailField(
         required=True,
         max_length=75,
+        widget=forms.TextInput(attrs={'size':35}),
         label="From:")
     subject = forms.CharField(
         required=True,
+        widget=forms.TextInput(attrs={'size':35}),
         label="Subject:")
     message = forms.CharField(
         required=True,
         widget=forms.Textarea,
-        label="Message:")
+        label="")
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
-        return super(MessageForm, self).__init__(*args, **kwargs)
+        return super(MailForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         if settings.AKISMET_KEY and not settings.OFFLINE:
@@ -73,6 +79,20 @@ class MessageForm(TemplatedForm):
             message=self.cleaned_data['message'],
             approved=not user.needs_moderation)
         message.save() # for some reason, needed to set id
+        if not message.approved:
+            # send a confirmation email
+            site = Site.objects.get_current()
+            body = render_to_string('confirmation_email.txt',
+                                    {'site':site,
+                                     'message':message,
+                                     'app_name':settings.APP_NAME})
+            email = EmailMessage("Your %s submission" \
+                                     % settings.APP_NAME,
+                                 body,
+                                 settings.DEFAULT_FROM_EMAIL,
+                                 [message.mto.email])
+            email.send()
+                                 
         return message
 
     

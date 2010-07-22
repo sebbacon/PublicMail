@@ -99,8 +99,8 @@ def make_response_from_email(parsed_email):
             if created:
                 if not in_reply_to.mto.organisation:
                     name = mfrom.email[mfrom.email.find('@')+1:]
-                    in_reply_to.mto.organisation = \
-                               Organisation.objects.create(name=name)
+                    in_reply_to.mto.organisation, _ = \
+                               Organisation.objects.get_or_create(name=name)
                     in_reply_to.mto.save()
                 mfrom.organisation = in_reply_to.mto.organisation
                 mfrom.save()
@@ -129,7 +129,8 @@ def make_response_from_email(parsed_email):
                                          message_id=message_id)
             logging.debug("Sending notification to %s, from %s" \
                           % (newmsg.mto.email, newmsg.mfrom.email))
-            send_mail(message=newmsg.message,
+            send_mail(mail=newmsg,
+                      message=newmsg.message,
                       subject=newmsg.subject,
                       mfrom=newmsg.mfrom.email,                      
                       mto=newmsg.mto.email,

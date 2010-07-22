@@ -50,7 +50,8 @@ def strip_re(subject):
     base_subject = re.sub(re_re, "", subject) 
     return base_subject
 
-def send_mail(message=None,
+def send_mail(mail=None,
+              message=None,
               subject=None,
               mfrom=None,
               mto=None,
@@ -61,7 +62,9 @@ def send_mail(message=None,
     
     site = Site.objects.get_current()
     footer = render_to_string('default_footer.txt',
-                              {'site':site})
+                              {'site':site,
+                               'mail':mail,
+                               'app_name':settings.APP_NAME})
     message = "%s\n\n%s" % (message,
                             footer)
     headers = {}

@@ -1,0 +1,13 @@
+Hi,
+
+You recently used {{ app_name }} to write an email  to {{ message.mto.email }}.
+
+If you definitely want to send the email, please click on this link:
+
+ http://{{ site }}{% url approve mail=message.id key=message.get_secret_key %}
+
+If you don't know anything about this, then ignore this email, or reply to let us know.
+
+Thanks!
+
+The {{ app_name }} people.

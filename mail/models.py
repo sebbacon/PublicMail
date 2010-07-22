@@ -26,6 +26,7 @@ class CustomUser(User):
         """
         try:
             email = kwargs['email']
+            organisation = email[email.find('@')+1:]
             super(CustomUser, self).__init__(*args, **kwargs)
             proxy_email_id = None
             n = 0
@@ -39,6 +40,8 @@ class CustomUser(User):
                 except CustomUser.DoesNotExist:
                     proxy_email_id = attempt
             self.proxy_email_id = proxy_email_id
+            self.organisation, _ = \
+                 Organisation.objects.get_or_create(name=organisation)
         except KeyError:
             super(CustomUser, self).__init__(*args, **kwargs)
         
@@ -84,6 +87,7 @@ class Mail(models.Model):
     previewed = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
     sent = models.DateTimeField(blank=True,
                                 null=True)
     message_id = models.CharField(max_length=50)
@@ -133,6 +137,11 @@ class Mail(models.Model):
         else:
             return self
         
+    def get_secret_key(self):
+        return hashlib.sha256(
+            self.subject + settings.SECRET_KEY)\
+            .hexdigest()[:6]
+
     def save(self, *args, **kwargs):
         self.message_id = _make_message_id(self)
         super(Mail, self).save(*args, **kwargs)

@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
-{% block title %}Preview your message{% endblock %}
+{% block title %}{{ start.subject }} - a public conversation on {{ app_name }}{% endblock %}
 
 {% block content %}
-{% for message in mail.all_in_thread %}
-<div class="email thread {% cycle 'even' 'odd' %}">
-<a name="message-{{message.id}}"></a>
-{% include "fragments/message.html" %}
-</div>
-{% endfor %}
+ <div id="mailthread">
+  <h2>{{ start.subject }}</h2>
+  <p>This is public conversation between {{ start.mfrom.email }} and {{ start.mto.email }}, started on {{ start.created|date:"d F, Y" }} </p>
+  {% for mail in mail.all_in_thread %}
+  <div class="email thread {% cycle 'even' 'odd' %}">
+  {% include "fragments/mail.html" %}
+  </div>
+  {% endfor %}
 
-{% ifequal start.mfrom request.user %}
- <hr />
- <h2>Write a followup:</h2>
- {% include "fragments/newmessage.html" %}
-{% endifequal %}
+  {% ifequal start.mfrom request.user %}
+   <hr />
+   <h2>Write a followup:</h2>
+   {% include "fragments/newmessage.html" %}
+  {% endifequal %}  
+ </div>
 
 {% endblock %}
 

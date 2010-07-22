@@ -1,0 +1,31 @@
+<div class="email">
+ <div class="header">
+   <div class="anchor">
+    <a name="mail-{{mail.id}}"></a><a href="#mail-{{mail.id}}">&para;</a>
+   </div>
+   <div class="headers">
+    <div class="from">
+     <span class="label">From:</span>
+     <span class="value">{{ mail.mfrom.email }}</span>
+    </div>
+    <div class="extra">
+     <div class="to">
+      <span class="label">To:</span>
+      <span class="value">{{ mail.mto.email }}</span>
+     </div>
+     <div class="date">
+      <span class="label">Date:</span>
+      <span class="value">{{ mail.created|date:"d M, Y H:m" }}</span>
+     </div>
+     <div class="subject">
+      <span class="label">Subject:</span>
+      <span class="value">{{ mail.subject }}</span>
+     </div>
+    </div>
+   </div>
+ </div>
+ <div class="message">
+  {{ mail.message}}
+ </div>
+</div>
+

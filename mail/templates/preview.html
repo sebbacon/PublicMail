@@ -3,17 +3,15 @@
 
 {% block content %}
 
-<p class="notice">Are you sure you want to send this email?</p>
+<form method="post">
+ <input type="submit" name="post" value="yes, post it" />
+ <input type="submit" name="delete" value="no, bin it" />
+</form>
 
 <div class="email preview">
-{% include "fragments/message.html" %}
+{% include "fragments/mail.html" %}
 </div>
 
-<form method="post">
-
-<input type="submit" value="send email" />
-
-</form>
 
 
 {% endblock %}

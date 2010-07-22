@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 
 from mail.models import CustomUser
-from mail.forms import MessageForm
+from mail.forms import MailForm
 from mail.forms import Mail
 from process_mail import make_response_from_file
 from process_mail import EX_NOUSER, EX_SOFTWARE, EX_NOINPUT
@@ -23,27 +23,27 @@ class MailTestCase(TestCase):
         user = CustomUser.objects.create(email="admin@baz.com",
                                          username="admin@baz.com",
                                          needs_moderation=False)
-        message1 = Mail.objects.create(
+        mail1 = Mail.objects.create(
             subject="ho",
             mfrom=user,
             mto=user,
             message="for the life of a bear")
         
-        message2 = Mail.objects.create(
+        mail2 = Mail.objects.create(
             subject="tiddly pom",
             mfrom=user,
             mto=user,
             message="it goes on snowing",
-            in_reply_to=message1)
-        message1.save()
-        message2.save()
+            in_reply_to=mail1)
+        mail1.save()
+        mail2.save()
         c = Client()
-        self.assertEqual(message1.childwalk().next(), message2)
+        self.assertEqual(mail1.childwalk().next(), mail2)
         response = c.get(reverse('mail',
-                                 kwargs={'mail':message1.pk}))
+                                 kwargs={'mail':mail1.pk}))
         self.assertContains(response, "tiddly pom")
         response = c.get(reverse('mail',
-                                 kwargs={'mail':message2.pk}),
+                                 kwargs={'mail':mail2.pk}),
                          follow=True)
         self.assertContains(response, "life of a bear")
         
@@ -58,9 +58,9 @@ class MailTestCase(TestCase):
                      'mfrom':user.email,
                      'subject':SUBJECT,
                      'message':'Hi'})
-        form = MessageForm(None, data)
+        form = MailForm(None, data)
         self.assertTrue(form.is_valid())
-        message = form.save()
+        mail_obj = form.save()
         c = Client()
         response = c.get('/process', follow=True)
         self.assertContains(response, SUBJECT)
@@ -101,27 +101,27 @@ class MailTestCase(TestCase):
                                          username="bar@baz.com")
         self.assertNotEqual(user.proxy_email, None)
 
-    def testSimpleMessageForm(self):
+    def testSimpleMailForm(self):
         data = QueryDict("").copy()
         data.update({'mto':'1@baz.com',
                      'mfrom':'2@baz.com',
                      'subject':'Hello',
                      'message':'Hi'})
-        form = MessageForm(None, data)
+        form = MailForm(None, data)
         self.assertTrue(form.is_valid())
-        message = form.save()
-        self.assertEquals(message.mto.email, data['mto'])
-        self.assertEquals(message.mfrom.email, data['mfrom'])
+        mail = form.save()
+        self.assertEquals(mail.mto.email, data['mto'])
+        self.assertEquals(mail.mfrom.email, data['mfrom'])
 
         # sending the same message twice is OK
         data.update({'mto':'1@baz.com',
                      'mfrom':'2@baz.com',
                      'subject':'Hello',
                      'message':'Hi'})
-        form = MessageForm(None, data)
+        form = MailForm(None, data)
         self.assertTrue(form.is_valid())
-        message = form.save()
-        self.assertFalse(message.approved)
+        mail = form.save()
+        self.assertFalse(mail.approved)
         
         # now try with a userfo who's unmoderated
         user = CustomUser.objects.create(email="3@baz.com",
@@ -131,10 +131,10 @@ class MailTestCase(TestCase):
                      'mfrom':'3@baz.com',
                      'subject':'Hello',
                      'message':'Hi'})
-        form = MessageForm(None, data)
+        form = MailForm(None, data)
         self.assertTrue(form.is_valid())
-        message = form.save()
-        self.assertTrue(message.approved)
+        mail = form.save()
+        self.assertTrue(mail.approved)
 
     def testSignupWorkflow(self):
         write_data = {'mto':'4@baz.com',
@@ -147,28 +147,21 @@ class MailTestCase(TestCase):
         response = c.post(reverse('write'), write_data, follow=True)
         self.assertContains(response, "Repeat password")
 
-        reg_data = {'email':response.context['message'].mfrom.email,
+        reg_data = {'email':response.context['mail'].mfrom.email,
                 'password':'asd',
                 'repeat_password':'asd'}
         response = c.post(response.request['PATH_INFO'],
                           reg_data,
                           follow=True)
-        # now check previewing
-        self.assertTemplateUsed(response, 'preview.html')
-        message = Mail.objects.get()
-        self.assertFalse(message.previewed)
-        c.post(reverse('preview', kwargs={'message':message.pk}))
-        message = Mail.objects.get()
-        self.assertTrue(message.previewed)
 
         # and when you're logged in and you write an email, you should
         # go straight to the preview page
         response = c.post(reverse('write'), write_data, follow=True)
-        self.assertTemplateUsed(response, 'preview.html')
+        self.assertContains(response, 'Your email has been saved')
 
         # test logging out
         response = c.get('/logout', follow=True)
-        self.assertNotContains(response, 'started the following')
+        self.assertNotContains(response, 'Your conversations')
         
         # they should see the login rather than register form this
         # time
@@ -181,7 +174,7 @@ class MailTestCase(TestCase):
                 'password': 'asd'}
         response = c.get(reverse('login_form'))
         response = c.post(reverse('login_form'), data, follow=True)
-        self.assertContains(response, 'started the following')
+        self.assertContains(response, 'Your conversations')
         
     def testEmailParsing(self):
         # create an initial "from" email
@@ -206,7 +199,7 @@ class MailTestCase(TestCase):
         recipient, _ = CustomUser.objects.get_or_create(
             email=mto,
             username=mto)
-        message = Mail.objects.create(
+        mail = Mail.objects.create(
             subject=message['subject'],
             mfrom=user,
             mto=recipient,
@@ -217,9 +210,9 @@ class MailTestCase(TestCase):
         raw_email = email.message_from_file(
             open("./testdata/mail4.txt", "r"))
         new_mto = user.proxy_email
-        raw_email.replace_header('in-reply-to', "<%s>" % message.message_id)
-        raw_email.replace_header('references', "<%s>" % message.message_id)
-        raw_email.replace_header('to', "%s <%s>" % (message.message_id,
+        raw_email.replace_header('in-reply-to', "<%s>" % mail.message_id)
+        raw_email.replace_header('references', "<%s>" % mail.message_id)
+        raw_email.replace_header('to', "%s <%s>" % (mail.message_id,
                                       new_mto))
         fp = StringIO(raw_email.as_string()) 
         response = make_response_from_file(fp)
@@ -236,8 +229,8 @@ class MailTestCase(TestCase):
         new_mto = user.proxy_email
         del(raw_email['in-reply-to'])
         del(raw_email['references'])
-        raw_email.replace_header('subject', "Re:RE: re:%s" % message.subject)
-        raw_email.replace_header('to', "%s <%s>" % (message.message_id,
+        raw_email.replace_header('subject', "Re:RE: re:%s" % mail.subject)
+        raw_email.replace_header('to', "%s <%s>" % (mail.message_id,
                                       new_mto))
         fp = StringIO(raw_email.as_string()) 
         response = make_response_from_file(fp)

@@ -25,6 +25,7 @@ class Migration:
             ('previewed', orm['mail.Mail:previewed']),
             ('approved', orm['mail.Mail:approved']),
             ('created', orm['mail.Mail:created']),
+            ('last_modified', orm['mail.Mail:last_modified']),
             ('sent', orm['mail.Mail:sent']),
             ('message_id', orm['mail.Mail:message_id']),
         ))
@@ -58,7 +59,7 @@ class Migration:
         'auth.group': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80', 'unique': 'True'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
+            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
         },
         'auth.permission': {
             'Meta': {'unique_together': "(('content_type', 'codename'),)"},
@@ -71,7 +72,7 @@ class Migration:
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'blank': 'True'}),
+            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -79,7 +80,7 @@ class Migration:
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'}),
+            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'max_length': '30', 'unique': 'True'})
         },
         'contenttypes.contenttype': {
@@ -100,6 +101,7 @@ class Migration:
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'in_reply_to': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'replies'", 'blank': 'True', 'null': 'True', 'to': "orm['mail.Mail']"}),
+            'last_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'message': ('django.db.models.fields.TextField', [], {}),
             'message_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'mfrom': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mfrom'", 'to': "orm['mail.CustomUser']"}),

@@ -66,7 +66,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'analytics_middleware.GoogleAnalyticsMiddleware'
+    'analytics_middleware.GoogleAnalyticsMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
 )
 
 ROOT_URLCONF = 'urls'
@@ -82,7 +83,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
-    "django.core.context_processors.auth"
+    "django.core.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+    "context_processors.global_vars"
 )
 
 INSTALLED_APPS = (
@@ -92,6 +95,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.admin',
+    'django.contrib.messages',
     'south',
     #'shorten',
     'mail',

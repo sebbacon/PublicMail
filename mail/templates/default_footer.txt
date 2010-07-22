@@ -1,3 +1,2 @@
 ---
-
-This email was sent via MailTrail, a system for publishing correspondence.  Please be aware that your reply may be made public.
+PLEASE NOTE: this email was sent via {{ app_name }}, a system for having conversations in public.  This conversation is being published at {% url mail mail=mail.id %}.  

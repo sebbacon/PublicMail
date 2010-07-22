@@ -3,21 +3,7 @@
 
 {% block content %}
 
-<div class="span-2">
  {% include "fragments/newmessage.html" %}
-</div>
-
-<div class="span-1 last">
- {% if messages %}
- <h2>You've started the following threads:</h2>
- <ul>
- {% for mail in messages %}
-   <li><a href="{{ mail.get_absolute_url }}">{{ mail.subject }}</a> (created {{ mail.created|date:"d/m/Y"}}, {% if mail.sent %}sent{% else %}pending moderator approval{% endif %})</li>
- {% endfor %}
- </ul>
- {% endif %}
-</div>
-
 
 {% endblock %}
 
