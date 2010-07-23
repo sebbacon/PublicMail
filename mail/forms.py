@@ -90,7 +90,7 @@ class MailForm(TemplatedForm):
                                      % settings.APP_NAME,
                                  body,
                                  settings.DEFAULT_FROM_EMAIL,
-                                 [message.mto.email])
+                                 [message.mfrom.email])
             email.send()
                                  
         return message
