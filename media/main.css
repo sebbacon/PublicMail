@@ -83,6 +83,10 @@ div.message {
  white-space: pre-wrap;
 }
 
+div.email {
+ margin-bottom: 10px;
+}
+
 div.email span.label {
  display: block;
  float: left;
