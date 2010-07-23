@@ -83,7 +83,7 @@ div.message {
  white-space: pre-wrap;
 }
 
-div.email {
+div.email.thread {
  margin-bottom: 10px;
 }
 
