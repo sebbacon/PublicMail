@@ -23,12 +23,12 @@
        {% if not mail.approved %}<a title="this message needs confirming by email (check your inbox)">!</a>{% endif %}
      </td>
     {% if not user.is_anonymous  %} 
-     <td>{{ mail.mto.email }}</td>
+     <td class="mto"><a href="{{ mail.get_absolute_url }}" title="{{ mail.mto.email }}">{{ mail.mto.email|truncateletters:10 }}</a></td>
     {% endif %}
-     <td>
-       <a href="{{ mail.get_absolute_url }}">{{ mail.subject }}</a>
+     <td class="subject">
+       <a href="{{ mail.get_absolute_url }}" title="{{ mail.subject }}">{{ mail.subject|truncatewords:6 }}</a>
      </td>
-     <td>
+     <td class="timeago">
        {{ mail.created|naturalTimeDifference}}
      </td>
    </tr>

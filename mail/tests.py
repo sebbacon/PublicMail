@@ -145,20 +145,18 @@ class MailTestCase(TestCase):
         c = Client()
         # first time they visit, they should get to the register form
         response = c.post(reverse('write'), write_data, follow=True)
-        self.assertContains(response, "Repeat password")
-
-        reg_data = {'email':response.context['mail'].mfrom.email,
-                'password':'asd',
-                'repeat_password':'asd'}
-        response = c.post(response.request['PATH_INFO'],
+        self.assertContains(response, "check your inbox")
+        mail = Mail.objects.get()
+        reg_data = {'email':mail.mfrom.email,
+                    'password':'asd',
+                    'repeat_password':'asd'}
+        response = c.post(reverse('login_or_register_form',
+                                  kwargs={'mail':\
+                                          mail.id}),
                           reg_data,
                           follow=True)
 
-        # and when you're logged in and you write an email, you should
-        # go straight to the preview page
-        response = c.post(reverse('write'), write_data, follow=True)
-        self.assertContains(response, 'Your email has been saved')
-
+        self.assertContains(response, 'Your conversations')
         # test logging out
         response = c.get('/logout', follow=True)
         self.assertNotContains(response, 'Your conversations')

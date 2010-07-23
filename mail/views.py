@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth import login, logout
+from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.http import HttpResponseRedirect as redirect
 from django.core.urlresolvers import reverse
@@ -34,13 +35,8 @@ def write(request):
         form = MailForm(request, request.POST, request.FILES)
         if form.is_valid():
             mail = form.save()
-            if request.user.is_anonymous() \
-                   or request.user.email != mail.mfrom.email:
-                return redirect(reverse('login_or_register_form',
-                                        kwargs={'mail': mail.pk}))
-            else:
-                return redirect(reverse('posted',
-                                        kwargs={'mail': mail.pk}))
+            return redirect(reverse('posted',
+                                    kwargs={'mail': mail.pk}))
     else:
         if request.user.is_anonymous():
             form = MailForm(request)
@@ -113,17 +109,32 @@ def posted(request, mail):
                             " Meanwhile, why not write another one?"))
     return redirect(reverse('write'))
 
+
 @render('preview.html')
 def preview(request, mail):
     mails = _get_mail_list(request)
     mail = Mail.objects.get(pk=mail)
+    if not mail.approved:
+        messages.error("You can't preview an email that's not been"
+                       " approved.  Please check your email for a "
+                       "link to approve this email.")
+        return redirect(reverse('mail',
+                                kwargs={'mail':mail.id}))
     if request.method == "POST":
         if request.POST.has_key('post'):
             mail.previewed = True
             mail.save()
-            messages.info(request, ("Your email has been posted!"))
-            return redirect(reverse('mail',
-                                    kwargs={'mail':mail.id}))
+            messages.success(request, ("Your email has been posted!"))
+            if not request.user.has_usable_password():
+                messages.warning(request, ("Now, please create a "
+                                           "password so you can log in "
+                                           "and check your messages in "
+                                           "the future.")) 
+                return redirect(reverse('login_or_register_form',
+                                        kwargs={'mail': mail.pk}))
+            else:
+                return redirect(reverse('mail',
+                                        kwargs={'mail':mail.id}))
         elif request.POST.has_key('delete'):
             messages.info(request, '"%s" deleted' \
                           % mail.subject)
@@ -131,36 +142,29 @@ def preview(request, mail):
             return redirect(reverse('write'))            
     return locals()
 
+
 @render('approve.html')
 def approve(request, mail, key):
     mails = _get_mail_list(request)
     mail = Mail.objects.get(pk=mail)
-    if request.user.is_anonymous() or \
-       request.user != mail.mfrom:
-        url = reverse('approve',
-                      kwargs={'mail':mail.id})
-        messages.warning(request, ("You have to be logged in to "
-                                   "approve this email"))
-        return redirect('/login_form/?next=%s' % url)
+    if key != mail.get_secret_key():
+        messages.error(request,
+                       "That was an invalid key")
+    elif mail.approved:
+        messages.error(request,
+                       "You've already approved this message")
     else:
-        if key != mail.get_secret_key():
-            messages.error(request,
-                           "That was an invalid key")
-        elif mail.approved:
-            messages.error(request,
-                           "You've already approved this message")
-        else:
-            mail.approved = True
-            mail.save()
-            messages.success(request, ("Thanks! Now do you definitely"
-                                       " want to send it?"))
-            return redirect(reverse('preview',
-                                    kwargs={'mail':mail.id}))
-        return redirect(reverse('write'))
+        mail.approved = True
+        mail.save()
+        user = authenticate(mail=mail)
+        login(request, user)        
+        return redirect(reverse('preview',
+                                kwargs={'mail':mail.id}))
+    return redirect(reverse('write'))
+
 
 @render('login_or_register_form.html')
 def login_or_register_form(request, mail):
-    logout(request)
     mail = Mail.objects.get(pk=mail)
     if mail.mfrom.has_usable_password():
         whichform = LoginForm
@@ -173,8 +177,9 @@ def login_or_register_form(request, mail):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect(reverse('posted',
-                                    kwargs={'mail': mail.pk}))
+            messages.success(request, "Success! You're now logged in.")
+            messages.info(request, "Want to write another email?")
+            return redirect(reverse('write'))
     else:
         form = whichform(initial={'email':mail.mfrom.email})
     return locals()

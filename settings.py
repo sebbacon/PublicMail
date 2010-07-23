@@ -102,6 +102,7 @@ INSTALLED_APPS = (
 )
 
 AUTHENTICATION_BACKENDS = ('backends.StandardBackend',
+                           'backends.MailKeyAuthBackend',
                            'django.contrib.auth.backends.ModelBackend',
                            )
 GOOGLE_ANALYTICS_ID = ""

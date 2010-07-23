@@ -3,12 +3,19 @@
 
 {% block content %}
 
-<form method="post">
- <input type="submit" name="post" value="yes, post it" />
- <input type="submit" name="delete" value="no, bin it" />
-</form>
+<ul class="messages">
+ <li class="success">
+  Thanks! Finally, do you definitely want to send this message?
+  <div id="confirm-post">
+   <form method="post">
+    <input type="submit" name="post" value="yes, post it" />
+    <input type="submit" name="delete" value="no, bin it" />
+   </form>
+  </div>
+ </li>
+</ul>
 
-<div class="email preview">
+<div id="mailthread" class="preview">
 {% include "fragments/mail.html" %}
 </div>
 

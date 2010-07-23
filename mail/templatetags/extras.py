@@ -49,6 +49,29 @@ def naturalTimeDifference(value):
             return 'a moment ago' 
     else:
         return str(value)
+@register.filter
+
+def truncateletters(value, arg):
+    """
+    Truncates a string after a certain number of letters
+    
+    Argument: Number of letters to truncate after
+    """
+
+    try:
+        length = int(arg)
+    except ValueError: # invalid literal for int()
+        return value # Fail silently
+    if not isinstance(value, basestring):
+        value = str(value)
+
+    if len(value) > length:
+        truncated = value[:length]
+        if not truncated.endswith('...'):
+            truncated += '...'
+        return truncated
+
+    return value
 
 @register.tag(name="short_url")       
 def short_url(parser, token):

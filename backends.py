@@ -18,6 +18,23 @@ class NoAuthBackend(ModelBackend):
         except CustomUser.DoesNotExist:
             return None
 
+class MailKeyAuthBackend(ModelBackend):
+    """
+    Authenticates against signup.models.CustomUser, without requiring
+    authorisation
+    """
+    def authenticate(self, mail=None):
+        try:
+            return mail.mfrom
+        except AttributeError:
+            return None
+
+    def get_user(self, user_id):
+        try:
+            return CustomUser.objects.get(pk=user_id)
+        except CustomUser.DoesNotExist:
+            return None
+
 class StandardBackend(ModelBackend):
     """
     Authenticates against signup.models.CustomUser, without requiring

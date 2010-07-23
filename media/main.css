@@ -119,8 +119,21 @@ div#inbox table  {
  padding: 0;
 }
 
+div#inbox table td {
+ padding: 3px 3px 3px 0px;
+ vertical-align: top;
+}
+
+div#inbox table td.timeago {
+ font-size: 0.9em;
+}
+
 div#inbox table tr td {
  background: transparent url(horizontal_line.png) no-repeat;
+}
+
+div#confirm-post {
+ padding: 1em;
 }
 
 ul.messages {
@@ -132,7 +145,7 @@ ul.messages li {
  list-style: none;
 }
 
-.error, .notice, .success, .info, .warning {padding:.8em;margin-bottom:1em;border:2px solid #ddd;}
+.error, .notice, .success, .info, .warning {padding:.8em;margin:1em;border:2px solid #ddd; border-radius: 5px;}
 .error, .warning {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
 .notice, .info {background:#FFF6BF;color:#514721;border-color:#FFD324;}
 .success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
@@ -214,10 +227,4 @@ table.mailbody td {
 
 table.mailbody input {
  margin: 5px;
-}
-
-#stamp {
- position: absolute;
- margin-left: 390px;
- margin-top: 10px;
 }
