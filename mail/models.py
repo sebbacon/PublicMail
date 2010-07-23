@@ -90,7 +90,7 @@ class Mail(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     sent = models.DateTimeField(blank=True,
                                 null=True)
-    message_id = models.CharField(max_length=50)
+    message_id = models.CharField(max_length=100)
     
     @permalink
     def get_absolute_url(self):
