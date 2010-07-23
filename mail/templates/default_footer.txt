@@ -1,2 +1,2 @@
 ---
-PLEASE NOTE: this email was sent via {{ app_name }}, a system for having conversations in public.  This conversation is being published at {% url mail mail=mail.id %}.  
+PLEASE NOTE: this email was sent via {{ app_name }}, a system for having conversations in public.  This conversation is being published at http://{{ site}}{% url mail mail=mail.id %}.  
