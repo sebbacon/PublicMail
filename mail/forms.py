@@ -72,7 +72,7 @@ class MailForm(TemplatedForm):
         if created:
             recipient.set_unusable_password()
             recipient.save()
-        approved = in_reply_to or not user.needs_moderation
+        approved = in_reply_to and True or not user.needs_moderation
         message = Mail.objects.create(
             subject=self.cleaned_data['subject'],
             mfrom=user,
