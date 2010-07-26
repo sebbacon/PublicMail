@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.http import HttpResponseRedirect as redirect
@@ -71,18 +72,13 @@ def view_mail_thread(request, mail):
     mail = Mail.objects.get(pk=mail)
     mails = _get_mail_list(request)
     start = mail.start_of_thread()
-    if request.method == "POST":
+    if not request.user.is_anonymous() \
+           and request.method == "POST":
         form = MailForm(request, request.POST, request.FILES)
         if form.is_valid():
-            mail = form.save()
-            mail.in_reply_to = start.end_of_thread()
-            mail.save()
-            if request.user.is_anonymous():
-                return redirect(reverse('login_or_register_form',
-                                        kwargs={'mail': mail.pk}))
-            else:
-                return redirect(reverse('preview',
-                                        kwargs={'mail': mail.pk}))
+            mail = form.save(in_reply_to=start.end_of_thread())
+            return redirect(reverse('preview',
+                                    kwargs={'mail': mail.pk}))
     else:
         if request.user.is_anonymous():
             form = MailForm(request)
@@ -109,13 +105,14 @@ def posted(request, mail):
                             " Meanwhile, why not write another one?"))
     return redirect(reverse('write'))
 
-
+@login_required
 @render('preview.html')
 def preview(request, mail):
     mails = _get_mail_list(request)
     mail = Mail.objects.get(pk=mail)
     if not mail.approved:
-        messages.error("You can't preview an email that's not been"
+        messages.error(request,
+                       "You can't preview an email that's not been"
                        " approved.  Please check your email for a "
                        "link to approve this email.")
         return redirect(reverse('mail',

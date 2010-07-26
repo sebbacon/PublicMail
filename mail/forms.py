@@ -54,7 +54,7 @@ class MailForm(TemplatedForm):
                 
         return self.cleaned_data
 
-    def save(self):
+    def save(self, in_reply_to=None):
         # first get or create a user
         email=self.cleaned_data['mfrom']
         try:
@@ -72,14 +72,16 @@ class MailForm(TemplatedForm):
         if created:
             recipient.set_unusable_password()
             recipient.save()
+        approved = in_reply_to or not user.needs_moderation
         message = Mail.objects.create(
             subject=self.cleaned_data['subject'],
             mfrom=user,
             mto=recipient,
             message=self.cleaned_data['message'],
-            approved=not user.needs_moderation)
+            in_reply_to=in_reply_to,
+            approved=approved)
         message.save() # for some reason, needed to set id
-        if not message.approved:
+        if not approved:
             # send a confirmation email
             site = Site.objects.get_current()
             body = render_to_string('confirmation_email.txt',

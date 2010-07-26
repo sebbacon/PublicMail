@@ -47,6 +47,47 @@ class MailTestCase(TestCase):
                          follow=True)
         self.assertContains(response, "life of a bear")
         
+    def testPreview(self):
+        user = CustomUser.objects.create(email="admin@baz.com",
+                                         username="admin@baz.com",
+                                         needs_moderation=False)
+        user.set_unusable_password()
+        mail1 = Mail.objects.create(
+            subject="ho",
+            mfrom=user,
+            mto=user,
+            message="for the life of a bear")
+        # first, make sure we can only preview mails that have been
+        # approved (by following link from email)
+        c = Client()
+        c.login(mail=mail1)
+        url = reverse('preview',
+                      kwargs={'mail':mail1.pk})
+        response = c.get(url, follow=True)
+        self.assertContains(response, "not been approved")
+        mail1.approved = True
+        mail1.save()
+        response = c.get(url, follow=True)
+        self.assertContains(response, "bin it")
+        preview_data = {'post':True}
+        # users without passwords are asked to set up their account
+        response = c.post(url, preview_data, follow=True)
+        self.assertTemplateUsed(response,
+                                'login_or_register_form.html')
+        mail1 = Mail.objects.get()
+        self.assertTrue(mail1.previewed)
+        # users without passwords just get the standard mail page
+        user.set_password("password")
+        user.save()
+        response = c.post(url, preview_data, follow=True)
+        self.assertTemplateUsed(response,
+                                'view_mail_thread.html')
+        # check deleting
+        preview_data = {'delete':True}
+        response = c.post(url, preview_data, follow=True)
+        self.assertEqual(Mail.objects.all().count(), 0)
+        
+        
 
     def testSendAndReply(self):
         user = CustomUser.objects.create(email="admin@baz.com",
