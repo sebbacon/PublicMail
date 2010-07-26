@@ -174,8 +174,10 @@ def login_or_register_form(request, mail):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Success! You're now logged in.")
-            messages.info(request, "Want to write another email?")
+            messages.success(request, ("Success! You're now logged in."))
+            messages.info(request, ("Your conversations are listed on"
+                                    " the right. You can start a new"
+                                    " conversation below."))
             return redirect(reverse('write'))
     else:
         form = whichform(initial={'email':mail.mfrom.email})
