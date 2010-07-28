@@ -1,0 +1,22 @@
+{% load extras %}
+ <div id="inbox">
+ <h3>{% if request.user.is_anonymous %}Recent public{% else %}Your{% endif %} conversations</h3>
+ <table>
+ {% for mail in mails %}
+   <tr>
+     <td>
+       {% if not mail.approved %}<a onclick="javascript:alert('We\'re waiting for you to confirm this email before we send it. Please check your inbox!');" title="We're waiting for you to confirm this email before we send it. Please check your inbox!">!</a>{% endif %}
+     </td>
+    {% if not user.is_anonymous  %} 
+     <td class="mto"><a href="{{ mail.get_absolute_url }}" title="{{ mail.mto.email }}">{{ mail.mto.email|truncateletters:10 }}</a></td>
+    {% endif %}
+     <td class="subject">
+       <a href="{{ mail.get_absolute_url }}" title="{{ mail.subject }}">{{ mail.subject|truncatewords:6 }}</a>
+     </td>
+     <td class="timeago">
+       {{ mail.created|naturalTimeDifference}}
+     </td>
+   </tr>
+ {% endfor %}
+ </table>
+ </div>
