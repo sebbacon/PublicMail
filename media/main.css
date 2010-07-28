@@ -3,7 +3,7 @@ html {font-size:100.01%;}
 body { 
   font-size:85%;
   font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
-  background-color: #eee;
+  background: #135965 url(bg.jpg) no-repeat;
 }
 
 
@@ -28,6 +28,11 @@ a {
 #header {
  vertical-align: bottom;
 }
+
+#header a {
+ color: white;
+}
+
 
 #header #pages {
  text-align: left;
@@ -119,6 +124,15 @@ div.email div.anchor a {
  color: red!important;
 }
 
+
+div#inbox h3 {
+ background: transparent url(bluegrad.png) repeat-x; 
+ color: white;
+ padding: 5px;
+ font-weight: bolder;
+ margin-top: 20px;
+}
+
 div#inbox table  {
  padding: 0;
 }
@@ -204,7 +218,11 @@ div.rightcol h3 {
 h2#startbutton {
  background: transparent url(redbuttonleft.png) no-repeat; 
  padding-left: 35px;
+}
 
+h2#startbutton a {
+ color: white;
+ text-decoration: none;
 }
 
 div#newmessage {
@@ -217,6 +235,7 @@ div#mailthread {
 
 div.mail {
  background-color: white;
+ min-height: 500px;
 }
 
 table.mailbody {
@@ -231,4 +250,8 @@ table.mailbody td {
 
 table.mailbody input {
  margin: 5px;
+}
+
+div.bottom-space {
+ background: white;
 }

@@ -10,29 +10,9 @@
     <li>You both continue your conversation by email</li>
     <li>The whole conversation is automatically published on its own web page</li>
    </ol>
-   <h2 id="startbutton">Start writing now!</h2>
+   <h2 id="startbutton">{% if request.user.is_anonymous %}<a href="{% url write %}">Start writing now!</a>{% else %}Start writing now!{% endif %}</h2>
  </div>
  {% endif %}
- <div id="inbox">
  {% if mails %}
- <h3>{% if request.user.is_anonymous %}Recent public{% else %}Your{% endif %} conversations</h3>
- <table>
- {% for mail in mails %}
-   <tr>
-     <td>
-       {% if not mail.approved %}<a onclick="javascript:alert('We\'re waiting for you to confirm this email before we send it. Please check your inbox!');" title="We're waiting for you to confirm this email before we send it. Please check your inbox!">!</a>{% endif %}
-     </td>
-    {% if not user.is_anonymous  %} 
-     <td class="mto"><a href="{{ mail.get_absolute_url }}" title="{{ mail.mto.email }}">{{ mail.mto.email|truncateletters:10 }}</a></td>
-    {% endif %}
-     <td class="subject">
-       <a href="{{ mail.get_absolute_url }}" title="{{ mail.subject }}">{{ mail.subject|truncatewords:6 }}</a>
-     </td>
-     <td class="timeago">
-       {{ mail.created|naturalTimeDifference}}
-     </td>
-   </tr>
- {% endfor %}
- </table>
+  {% include "fragments/inbox.html" %}
  {% endif %}
- </div>
