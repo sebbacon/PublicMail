@@ -24,7 +24,8 @@ def _get_mail_list(request):
     if request.user.is_anonymous():
         mails = Mail.objects.filter(in_reply_to=None,
                                     approved=True)\
-                                    .order_by('-last_modified')
+                                    .order_by('-last_modified')\
+                            .all()[:5]
     else:
         mails = request.user.mfrom.filter(in_reply_to=None)
     return mails
