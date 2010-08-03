@@ -27,7 +27,9 @@ def _get_mail_list(request):
                                     .order_by('-last_modified')\
                             .all()[:5]
     else:
-        mails = request.user.mfrom.filter(in_reply_to=None)
+        mails = request.user.mfrom.filter(in_reply_to=None)\
+                .order_by('-last_modified')
+                
     return mails
 
 @render('write.html')
