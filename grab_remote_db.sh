@@ -1,3 +1,3 @@
-dropdb volnet
-createdb volnet
-ssh seb.fry-it.com 'su -c "pg_dump volnet " postgres' | psql volnet
+dropdb mailtrail
+createdb mailtrail
+ssh root@seb.fry-it.com 'su -c "pg_dump mailtrail " postgres' | psql mailtrail
