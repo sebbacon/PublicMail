@@ -43,7 +43,7 @@ def _has_collapsable(line):
             our_system_footer]
     found = False
     for sig in sigs:
-        found = re.search(sig, line, re.I)
+        found = re.search(sig, line, re.I|re.DOTALL)
         if found:
             break
     return bool(found)
