@@ -257,5 +257,13 @@ div.bottom-space {
 }
 
 span.collapsed {
- color: lightgray;
+ color: gray;
+ display: none;
+}
+
+div.uncollapse {
+ color: green;
+ font-size: 0.8em;
+ cursor: pointer;
+ cursor: hand;
 }

@@ -8,5 +8,14 @@ $(document).ready(function() {
       $('div.headers div.extra').toggle('slow');
     }
   );
+  $('div.message div.uncollapse').toggle(
+    function() {
+	$(this).next().toggle();
+	$(this).text("- hide quoted text -")
+    },
+    function() {
+	$(this).next().toggle();
+	$(this).text("- show quoted text -")
+    });
 });
 

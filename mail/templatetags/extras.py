@@ -1,8 +1,10 @@
 import re
+from sets import Set
 from datetime import datetime, timedelta
 
 from django import template
 from django.template import Node
+from django.utils.html import escape
 
 from shorten.models import Shortened
 
@@ -22,27 +24,61 @@ def _quote_normalise(line):
     return cleaned
 
 def _has_collapsable(line):
-    quote_prefix = r"^On .+ (wrote|said):"
+    """Return true if the line provided contains text that suggests it
+    should be collapsed
+    """
+    line = line.strip()
+    quote_prefix_1 = r"^On .+ (wrote|said):"
+    quote_prefix_2 = r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}.+ (wrote|said):"
+    quote_prefix_3 = r"^>"
     original_message = r"^----*\s"
-    sigs = [quote_prefix, original_message]
+    our_system_footer = "PLEASE NOTE"
+    
+    empty_quote = r"^>\s*$"
+    sigs = [quote_prefix_1,
+            quote_prefix_2,
+            quote_prefix_3,
+            original_message,
+            empty_quote,
+            our_system_footer]
+    found = False
     for sig in sigs:
-        found = re.search(sig, line)        
+        found = re.search(sig, line, re.I)
+        if found:
+            break
+    return bool(found)
 
 @register.filter
 def collapsequotes(message):
     """Usage: {{ message|collapsequotes }}
+
+    Add a <span> around lines that should be collapsed; either lines
+    we've seen before, or lines that include suggestive text.
     """
     parent = message.in_reply_to
-    seen = []
+    seen = Set()
     mylines = []
     while parent:
-        seen.extend([_quote_normalise(x)\
-                     for x in parent.message.splitlines()])
+        for parentline in parent.message.splitlines():
+            normalised = _quote_normalise(parentline)
+            if normalised:                
+                seen.add(normalised)
         parent = parent.in_reply_to
+    print seen
+    collapsing = False
     for line in message.message.splitlines():
         norm_line = _quote_normalise(line)
-        if _has_collapsable(norm_line) or norm_line in seen:
-            line = '<span class="collapsed">%s</span>' % line
+        should_collapse = _has_collapsable(line) \
+                          or norm_line in seen \
+                          or (not line.strip() and collapsing)
+        if not collapsing and should_collapse:
+            collapsing = True
+            line = '<div class="uncollapse">- show quoted text -</div> <span class="collapsed">%s' % escape(line)
+        elif collapsing and not should_collapse:
+            collapsing = False
+            line = '</span>%s' % escape(line)
+        else:
+            line = escape(line)
         mylines.append(line)
     return "\n".join(mylines)            
 
