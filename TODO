@@ -1,3 +1,26 @@
-security: currently anyone could inject into thread by emailing a
-   special address based on hash of what they guess recipient's email
-   is.  hash it with secret key.
+Make the From: field look less spam-like.  Maybe more human readable;
+   maybe just using real name.
+
+Ensure the "please note" footer is always in every mail sent via the
+   system
+
+Make the browse interface more prominent; be structured about each
+   email address having its own page, maybe with explicit name /
+   description and tags for the addresses
+
+   Include a way to see all recent conversations *when logged in*
+
+Emphasise that the archive is permanent
+
+Make it clear it's for communicating with organisations or famous
+   people so you can share the communications.  Populate it with nice
+   examples.
+
+API that lets you post a new message, get back a URL.
+
+In reading interface, collapse quotes
+
+Consider having some way to curate lists of organisations / people
+   (using tags?)
+
+Store entire email source including headers
