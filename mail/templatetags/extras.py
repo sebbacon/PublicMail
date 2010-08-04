@@ -64,7 +64,6 @@ def collapsequotes(message):
             if normalised:                
                 seen.add(normalised)
         parent = parent.in_reply_to
-    print seen
     collapsing = False
     for line in message.message.splitlines():
         norm_line = _quote_normalise(line)
