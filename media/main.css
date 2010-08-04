@@ -255,3 +255,7 @@ table.mailbody input {
 div.bottom-space {
  background: white;
 }
+
+span.collapsed {
+ color: lightgray;
+}

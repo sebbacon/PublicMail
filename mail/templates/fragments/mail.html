@@ -1,3 +1,4 @@
+{% load extras %}
 <div class="email">
  <div class="header">
    <div class="anchor">
@@ -25,7 +26,7 @@
    </div>
  </div>
  <div class="message">
-  {{ mail.message}}
+  {{ mail|collapsequotes }}
  </div>
 </div>
 
