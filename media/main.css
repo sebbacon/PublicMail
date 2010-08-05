@@ -86,6 +86,7 @@ p.helptext {
 
 div.message {
  white-space: pre-wrap;
+ padding: 3px;
 }
 
 div.email.thread {
