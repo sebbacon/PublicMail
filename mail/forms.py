@@ -36,7 +36,11 @@ class MailForm(TemplatedForm):
         return super(MailForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        if settings.AKISMET_KEY and not settings.OFFLINE:
+        if self.cleaned_data.get('mfrom') \
+           and self.cleaned_data.get('mto') \
+           and self.cleaned_data.get('message') \
+           and self.cleaned_data.get('subject') \
+           and settings.AKISMET_KEY and not settings.OFFLINE:
             api = Akismet(settings.AKISMET_KEY,
                           agent="mailtrail")
             req = self.request.META
@@ -50,7 +54,7 @@ class MailForm(TemplatedForm):
             spam = api.comment_check(self.cleaned_data['message'],
                                      data=data)
             if spam:
-                raise forms.ValidationError('That looks too much like spam')
+                raise forms.ValidationError('Sorry, that looks like spam')
                 
         return self.cleaned_data
 
