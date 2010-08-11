@@ -88,9 +88,11 @@ def make_response_from_email(parsed_email):
             thread = Mail.objects.filter(
                 mfrom=to_user,
                 subject__contains=base_subject)
+            logging.debug("Found thread %s" % thread)
             try:
                 thread = thread[0]
                 in_reply_to = thread.start_of_thread()
+                logging.debug("Found thread start %s" % in_reply_to)
             except IndexError:
                 pass
             
