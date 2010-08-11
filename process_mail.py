@@ -85,15 +85,12 @@ def make_response_from_email(parsed_email):
             # stick this in at the appropriate point.
             base_subject = strip_re(parsed_email['subject'])
             logging.debug("Trying subject heuristics")
-            thread_starts = Mail.objects.filter(
-                Q(mfrom=to_user,
-                  in_reply_to=None,
-                  subject__contains=base_subject) | \
-                Q(mto=to_user,
-                  in_reply_to=None,
-                  subject__contains=base_subject))
+            thread = Mail.objects.filter(
+                mfrom=to_user,
+                subject__contains=base_subject)
             try:
-                in_reply_to = thread_starts[0]
+                thread = thread[0]
+                in_reply_to = thread.start_of_thread()
             except IndexError:
                 pass
             
