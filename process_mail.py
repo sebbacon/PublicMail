@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.DEBUG,
                     filename="/tmp/mailtrail.log",
                     filemode="w")
 
+from django.db.models import Q
 import email
 from email.utils import parseaddr
 
@@ -56,9 +57,9 @@ def make_response_from_email(parsed_email):
                  .replace(">", "")
     logging.debug("Looking for proxy_email of %s" % proxy_email_id)
     try:
-        user = CustomUser.objects.get(proxy_email_id=proxy_email_id)
+        to_user = CustomUser.objects.get(
+            proxy_email_id=proxy_email_id)
         in_reply_to = None
-
         # http://www.jwz.org/doc/threading.html
         references = parsed_email.get('references','')
         references = references and references.split(" ") or []
@@ -85,9 +86,12 @@ def make_response_from_email(parsed_email):
             base_subject = strip_re(parsed_email['subject'])
             logging.debug("Trying subject heuristics")
             thread_starts = Mail.objects.filter(
-                mfrom=user,
-                in_reply_to=None,
-                subject__contains=base_subject)
+                Q(mfrom=to_user,
+                  in_reply_to=None,
+                  subject__contains=base_subject) | \
+                Q(mto=to_user,
+                  in_reply_to=None,
+                  subject__contains=base_subject))
             try:
                 in_reply_to = thread_starts[0]
             except IndexError:
@@ -104,7 +108,7 @@ def make_response_from_email(parsed_email):
                     in_reply_to.mto.save()
                 mfrom.organisation = in_reply_to.mto.organisation
                 mfrom.save()
-            mto = user
+            mto = to_user
             counter = 1
             for part in parsed_email.walk():
                 if part.get_content_maintype() == "multipart":
