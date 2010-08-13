@@ -29,7 +29,7 @@ a {
  vertical-align: bottom;
 }
 
-#header a {
+#header a, #header div#pages ul li {
  color: white;
 }
 
@@ -84,9 +84,18 @@ p.helptext {
  margin-top:3px;
 }
 
-div.message {
+.message {
  white-space: pre-wrap;
  padding: 3px;
+}
+
+.message.footer {
+ font-size: 0.8em;
+}
+
+p.message.footer.quiet {
+ padding: 0;
+ margin: 0;
 }
 
 div.email.thread {
