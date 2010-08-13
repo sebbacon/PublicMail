@@ -80,6 +80,7 @@ class Mail(models.Model):
     mto = models.ForeignKey(CustomUser,
                             related_name="mto")
     message = models.TextField()
+    source = models.TextField()
     in_reply_to = models.ForeignKey('self',
                                     related_name="replies",
                                     blank=True,

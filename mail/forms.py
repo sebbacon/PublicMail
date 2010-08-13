@@ -89,6 +89,7 @@ class MailForm(TemplatedForm):
             subject=self.cleaned_data['subject'],
             mfrom=user,
             mto=recipient,
+            source="",
             message=self.cleaned_data['message'],
             in_reply_to=in_reply_to,
             approved=approved)

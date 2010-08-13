@@ -128,6 +128,7 @@ def make_response_from_email(parsed_email):
                                          mfrom=mfrom,
                                          mto=mto,
                                          message=message,
+                                         source=parsed_email.as_string(),
                                          in_reply_to=in_reply_to,
                                          message_id=message_id)
             logging.debug("Sending notification to %s, from %s" \
