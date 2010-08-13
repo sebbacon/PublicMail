@@ -59,6 +59,9 @@ class CustomUser(User):
             name = self.email
         return name
     
+    @property
+    def full_name(self):
+        return "%s %s" % (self.first_name, self.last_name)
         
     def __unicode__(self):
         return "%s (%s)" % (self.email, self.proxy_email)

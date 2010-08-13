@@ -21,6 +21,7 @@ from django.template import Context, loader
 from django.core.mail import EmailMessage
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
 class TemplatedForm(forms.Form):
     def output_via_template(self):
@@ -50,6 +51,20 @@ def strip_re(subject):
     base_subject = re.sub(re_re, "", subject) 
     return base_subject
 
+def get_footer_for_mail(mail=None):
+    site = Site.objects.get_current()
+    if mail:
+        archive_link = "http://%s%s" % \
+                       (site,
+                        reverse('mail', kwargs={'mail':mail.id}))
+    else:
+        archive_link = "http://%s/[somewhere]" % site
+        
+    footer = render_to_string('default_footer.txt',
+                              {'archive_link':archive_link,
+                               'app_name':settings.APP_NAME})
+    return footer
+
 def send_mail(mail=None,
               message=None,
               subject=None,
@@ -59,12 +74,7 @@ def send_mail(mail=None,
               reply_to=None):
     """Send an email with the standard unsubscribe footer
     """
-    
-    site = Site.objects.get_current()
-    footer = render_to_string('default_footer.txt',
-                              {'site':site,
-                               'mail':mail,
-                               'app_name':settings.APP_NAME})
+    footer = get_footer_for_mail(mail)
     message = "%s\n\n%s" % (message,
                             footer)
     headers = {}

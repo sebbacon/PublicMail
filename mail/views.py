@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 
 from utils import render
 from utils import send_mail
+from utils import get_footer_for_mail
 from forms import LoginForm
 from forms import RegisterForm
 from forms import MailForm
@@ -35,6 +36,7 @@ def _get_mail_list(request):
 @render('write.html')
 def write(request):
     mails = _get_mail_list(request)
+    footer = get_footer_for_mail()
     if request.method == "POST":
         form = MailForm(request, request.POST, request.FILES)
         if form.is_valid():
@@ -46,7 +48,8 @@ def write(request):
             form = MailForm(request)
         else:
             form = MailForm(request,
-                               initial={'mfrom':request.user.email})
+                               initial={'mfrom':request.user.email,
+                                        'name':request.user.full_name})
     return locals()
 
 @render('process_queue.txt')
