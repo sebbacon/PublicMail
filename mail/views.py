@@ -56,11 +56,14 @@ def process_queue(request):
                .order_by('created')[:10]
     done = []
     for mail in mails:
+        mfrom = "%s %s <%s>" % (mail.mfrom.first_name,
+                                mail.mfrom.last_name,
+                                mail.mfrom.proxy_email)
         output = send_mail(
             mail=mail,
             message=mail.message,
             subject=mail.subject,
-            mfrom=mail.mfrom.proxy_email,
+            mfrom=mfrom,
             mto=mail.mto.email,
             message_id=mail.message_id)
         mail.sent = datetime.now()

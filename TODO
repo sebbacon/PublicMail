@@ -1,6 +1,3 @@
-Make the From: field look less spam-like.  Maybe more human readable;
-   maybe just using real name.
-
 Ensure the "please note" footer is always in every mail sent via the
    system
 
@@ -24,3 +21,81 @@ Consider having some way to curate lists of organisations / people
    (using tags?)
 
 Store entire email source including headers
+
+Approach George Monbiot, MediaLens, Guardian.  High-profile public
+   debates taking place via the website.
+
+Bug from Duncan:
+
+2010-08-11 19:13:26,300 DEBUG Received email
+--------
+X-Original-To: trail-1d25b1@publicmail.fry-it.com
+Received: from mail-wy0-f181.google.com (mail-wy0-f181.google.com
+        [74.125.82.181])
+        by seb.fry-it.com (Postfix) with ESMTP id 241CE50050DB9
+        for <trail-1d25b1@publicmail.fry-it.com>;
+        Wed, 11 Aug 2010 18:13:22 +0000 (UTC)
+Received: by wyf28 with SMTP id 28so481451wyf.12
+        for <trail-1d25b1@publicmail.fry-it.com>;
+        Wed, 11 Aug 2010 11:13:21 -0700 (PDT)
+Received: by 10.227.157.200 with SMTP id c8mr16960298wbx.69.1281550401086;
+        Wed, 11 Aug 2010 11:13:21 -0700 (PDT)
+Received: from [10.19.203.161] ([82.132.248.22])
+        by mx.google.com with ESMTPS id e31sm326845wbe.17.2010.08.11.11.13.18
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Wed, 11 Aug 2010 11:13:20 -0700 (PDT)
+Subject: Re: Cow or pig?
+References: <20100811114502.30215.79450@seb>
+From: Duncan Clark <duncan@1010uk.org>
+Content-Type: text/plain;
+        charset=us-ascii
+X-Mailer: iPhone Mail (8A306)
+In-Reply-To: <20100811114502.30215.79450@seb>
+Message-Id: <509C6C7F-3B32-40A9-9348-4F7CFEFBACD3@1010uk.org>
+Date: Wed, 11 Aug 2010 19:14:07 +0100
+To: "trail-1d25b1@publicmail.fry-it.com" <trail-1d25b1@publicmail.fry-it.com>
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (iPhone Mail 8A306)
+
+No no no no! Only cows have what it takes! And so many breeds to choose from=
+. Brrrrrrrrrrrr!
+
+Excuse brevity -- sent from a phone.
+
+On 11 Aug 2010, at 12:45, mail@duncanclark.net wrote:
+
+> Dear Duncan,
+>=20
+> Your "cattle" do nothing for me. I say piggies every time!
+>=20
+> Duncan
+>=20
+> Excuse brevity -- sent from a phone.
+>=20
+> On 11 Aug 2010, at 10:55, trail-0d6b77@publicmail.fry-it.com wrote:
+>=20
+>> Dear Duncan,
+>>=20
+>> I say cow. Cow cow cow. I'm for cow!
+>>=20
+>> Down with pigs. They are porky losers.
+>>=20
+>> Yours
+>> Duncan
+>>=20
+>> ---
+>> PLEASE NOTE: this email was sent via PublicMail, a system for having conv=
+ersations in public.  This conversation is being published at http://publicm=
+ail.fry-it.com/mail/31/. =20
+>=20
+>=20
+> ---
+> PLEASE NOTE: this email was sent via PublicMail, a system for having conve=
+rsations in public.  This conversation is being published at http://publicma=
+il.fry-it.com/mail/32/. =20
+
+--------
+2010-08-11 19:13:26,300 DEBUG Looking for proxy_email of 1d25b1
+2010-08-11 19:13:26,985 DEBUG Possible references in thread: 20100811114502.30215.79450@seb, 20100811114502.30215.79450@seb
+2010-08-11 19:13:26,991 DEBUG Trying subject heuristics
+2010-08-11 19:13:27,224 WARNING Couldn't find thread for 509C6C7F-3B32-40A9-9348-4F7CFEFBACD3@1010uk.org

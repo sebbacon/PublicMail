@@ -22,6 +22,10 @@ class MailForm(TemplatedForm):
         max_length=75,
         widget=forms.TextInput(attrs={'size':35}),
         label="From:")
+    name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'size':35}),
+        label="Your name:")
     subject = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={'size':35}),
@@ -68,11 +72,15 @@ class MailForm(TemplatedForm):
             user = CustomUser.objects.create(email=email,
                                              username=email)
             user.set_unusable_password()
-            user.save()
+        first_name, last_name = _parse_names(
+            self.cleaned_data['name'])
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
         # now create an email, and decide if it needs moderation
         recipient, created = CustomUser.objects.get_or_create(
             username=self.cleaned_data['mto'],
-            email=self.cleaned_data['mto'])
+            email=self.cleaned_data['mto'])        
         if created:
             recipient.set_unusable_password()
             recipient.save()
@@ -154,3 +162,7 @@ class RegisterForm(TemplatedForm):
                             password=self.cleaned_data['password']) 
         return user
     
+
+def _parse_names(name):
+    parts = name.split(" ")
+    return parts[0], " ".join(parts[1:])

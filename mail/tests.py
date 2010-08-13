@@ -100,7 +100,15 @@ class MailTestCase(TestCase):
                      'subject':SUBJECT,
                      'message':'Hi'})
         form = MailForm(None, data)
+        self.assertFalse(form.is_valid())
+        data.update({'mto':'1@baz.com',
+                     'mfrom':user.email,
+                     'subject':SUBJECT,
+                     'name': 'One Baz',
+                     'message':'Hi'})
+        form = MailForm(None, data)
         self.assertTrue(form.is_valid())
+        
         mail_obj = form.save()
         c = Client()
         response = c.get('/process', follow=True)
@@ -127,7 +135,6 @@ class MailTestCase(TestCase):
         # two emails should have been created, threaded together
         mails = Mail.objects.order_by('created')
         self.assertEqual(mails[0].childwalk().next(), mails[1])
-
         # and an email should have been sent to the original sender,
         # with a proxied reply-to address
         self.assertEqual(mail.outbox[-1].to[0],
@@ -147,6 +154,7 @@ class MailTestCase(TestCase):
         data.update({'mto':'1@baz.com',
                      'mfrom':'2@baz.com',
                      'subject':'Hello',
+                     'name':'Two Baz',
                      'message':'Hi'})
         form = MailForm(None, data)
         self.assertTrue(form.is_valid())
@@ -181,6 +189,7 @@ class MailTestCase(TestCase):
         write_data = {'mto':'4@baz.com',
                 'mfrom':'5@baz.com',
                 'subject':'Hello',
+                'name':'Five Baz',
                 'message':'Hi'}
         
         c = Client()
