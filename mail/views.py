@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.http import HttpResponseRedirect as redirect
+from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from utils import render
@@ -14,6 +15,7 @@ from forms import LoginForm
 from forms import RegisterForm
 from forms import MailForm
 from models import Mail
+from models import CustomUser
 
 
 @render('home.html')
@@ -75,7 +77,20 @@ def process_queue(request):
     return locals()
 
 
-        
+@render('view_address.html')
+def view_address(request, email):
+    user = CustomUser.objects.get(email=email)
+    threads = set([x.start_of_thread() for x in \
+                   Mail.objects.filter(mfrom=user)])
+    threads.update([x.start_of_thread() for x in \
+                    Mail.objects.filter(mto=user)])
+    if request.user.is_anonymous() or request.user.email != email:
+        threads = [x for x in threads if x.approved]
+    if not threads:
+        raise Http404
+    return locals()
+
+
 @render('view_mail_thread.html')
 def view_mail_thread(request, mail):
     mail = Mail.objects.get(pk=mail)

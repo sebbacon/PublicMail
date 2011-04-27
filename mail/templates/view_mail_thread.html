@@ -4,7 +4,7 @@
 {% block content %}
  <div id="mailthread">
   <h2>{{ start.subject }}</h2>
-  <p>This is a public conversation between {{ start.mfrom.email }} and {{ start.mto.email }}, started on {{ start.created|date:"d F, Y" }}</p>
+  <p>This is a public conversation between <a href="{{ start.mfrom.get_absolute_url }}">{{ start.mfrom.email }}</a> and <a href="{{ start.mto.get_absolute_url }}">{{ start.mto.email }},</a> started on {{ start.created|date:"d F, Y" }}</p>
   {% for mail in mail.all_in_thread %}
   <div class="email thread {% cycle 'even' 'odd' %}">
   {% include "fragments/mail.html" %}

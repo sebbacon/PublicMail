@@ -2,13 +2,12 @@
  {% if request.user.is_anonymous %}
  <div id="welcome">
    <h2>Welcome to {{ app_name }}!</h2>
-   <p>{{ app_name }} is a simple way to have conversations in public.  Here's how it works:</p>
+   <p>{{ app_name }} is a simple way to publicly share conversations with organisations or famous people.  Here's how it works:</p>
    </p>
    <ol>
     <li>Start a conversation via the website</li>
-    <li>The recipient gets it as an email</li>
-    <li>You both continue your conversation by email</li>
-    <li>The whole conversation is automatically published on its own web page</li>
+    <li>Continue it by email</li>
+    <li>The conversation is automatically published on its own web page</li>
    </ol>
    <h2 id="startbutton">{% if request.user.is_anonymous %}<a href="{% url write %}">Start writing now!</a>{% else %}Start writing now!{% endif %}</h2>
  </div>

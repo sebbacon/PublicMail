@@ -7,12 +7,12 @@
    <div class="headers">
     <div class="from">
      <span class="label">From:</span>
-     <span class="value">{{ mail.mfrom.email }}</span>
+     <span class="value"><a href="{{ mail.mfrom.get_absolute_url }}">{{ mail.mfrom.email }}</a></span>
     </div>
     <div class="extra">
      <div class="to">
       <span class="label">To:</span>
-      <span class="value">{{ mail.mto.email }}</span>
+      <span class="value"><a href="{{ mail.mto.get_absolute_url }}">{{ mail.mto.email }}</a></span>
      </div>
      <div class="date">
       <span class="label">Date:</span>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Public conversations with {{ user.display_name }} on {{ app_name }}{% endblock %}
+
+
+{% block content %}
+
+ <div>
+  <h2>{{ user.display_name }}'s conversations on {{ app_name }}</h2>
+  <table>
+   <tr>
+     <th>From</th>
+     <th>Subject</th>
+     <th>Date</th>
+   </tr>
+   {% for mail in threads %}
+   <tr>
+     {% ifequal mail.mfrom user %}
+     <td>{{ mail.mfrom.display_name }} &rarr; <a href="{{ mail.mto.get_absolute_url }}">{{ mail.mto.display_name }}</a></td>
+     {% else %}
+     <td><a href="{{ mail.mfrom.get_absolute_url }}">{{ mail.mfrom.display_name }}</a> &rarr; {{ mail.mto.display_name }}</td>
+     {% endifequal %}
+     <td><a href="{{ mail.get_absolute_url }}">{{ mail.subject }}</a></td>
+     <td>{{ mail.created|date:"d M Y"}}</td>
+   </tr>
+  {% endfor %}
+  </table>
+ </div>
+
+{% endblock %}
+

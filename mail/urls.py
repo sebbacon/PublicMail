@@ -1,12 +1,18 @@
 from django.conf.urls.defaults import *
 import views
 
+email_rx = r"^address/(?P<email>[-a-z0-9_.]+@" + \
+           "(?:[-a-z0-9]+\.)+[a-z]{2,6})/$"
+
 urlpatterns = patterns('mail',
     url(r'^$', views.home, name="home"),
     url(r'^write$', views.write, name="write"),
     url(r'^mail/(?P<mail>\w+)/$',
         views.view_mail_thread,
         name="mail"),
+    url(email_rx,
+        views.view_address,
+        name="address"),
     url(r'^preview/(?P<mail>\w+)/$',
         views.preview,
         name="preview"),

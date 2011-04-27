@@ -23,3 +23,5 @@ Consider having some way to curate lists of organisations / people
 Approach George Monbiot, MediaLens, Guardian.  High-profile public
    debates taking place via the website.
 
+_has_collapsible only works one line at a time, but some things are
+   split over two

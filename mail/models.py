@@ -68,7 +68,7 @@ class CustomUser(User):
 
     @permalink
     def get_absolute_url(self):
-        return ("user", (self.id,))
+        return ("address", (self.email,))
 
 
 def _make_message_id(message):
